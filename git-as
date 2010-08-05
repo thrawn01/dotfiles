@@ -1,4 +1,25 @@
 #! /usr/bin/python
+
+# ---------------------------------------
+# For users on a pairing station that both use git
+# The script allow you specify what user you want 
+# to to preform git actions under
+# 
+# Example:
+#   git as derrick commit -m "This is a commit by derrick"
+#   git as nathen commit -m "This is a commit by nathen"
+#   git as ryan commit -m "This is a commit by ryan"
+#
+# Or if you want to change users for all the following commands
+#   git as derrick 
+#   git commit -m "This is a commit by derrick"
+#
+# Installation
+#   Run the setup.py script in my project 
+#   Or
+#   Copy this file to a ~/bin directory in your path and the /lib files needed
+# ---------------------------------------
+
 import sys, os, ConfigParser
 
 # Add ~/bin/lib to the python search path
@@ -22,8 +43,8 @@ try:
         raise Exception("Please specify a user to preform as")
 
     if config.get( args[1], 'name' ):
-        runCmd( 'git config --global user.name "%s"' % config.get( args[1], 'name' ) )
-        runCmd( 'git config --global user.email "%s"' % config.get( args[1], 'email' ) )
+        runCmd( 'git config user.name "%s"' % config.get( args[1], 'name' ) )
+        runCmd( 'git config user.email "%s"' % config.get( args[1], 'email' ) )
     else:
         print "-- Unknown user '%s' " % args[1]
 
