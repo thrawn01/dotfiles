@@ -1,0 +1,24 @@
+#! /bin/sh
+
+if [ "$1" == "ryan" ]; then
+    git config --global user.name "Ryan Springer"
+    git config --global user.email ryan.springer@rackspace.com
+    git commit -m "$2" 
+    exit 0
+fi
+
+if [ "$1" == "nathen" ]; then
+    git config --global user.name "Nathen Hinson"
+    git config --global user.email nathen.hinson@rackspace.com
+    git commit -m "$2" 
+    exit 0
+fi
+
+if [ "$1" == "derrick" ]; then
+    git config --global user.name "Derrick Wippler"
+    git config --global user.email derrick.wippler@rackspace.com
+    git commit -m "$2" 
+    exit 0
+fi
+
+echo "Unknown User"

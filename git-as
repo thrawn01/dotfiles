@@ -1,0 +1,42 @@
+#! /usr/bin/python
+import sys, os, ConfigParser
+
+# Add ~/bin/lib to the python search path
+sys.path.append( os.path.expanduser("~/bin/lib") )
+from utils import safeArgs, quoteArgs, removeArgs, runCmd
+
+try:
+    if not os.path.exists( os.path.expanduser("~/.git-users") ):
+        print "Please create a ini file called ~/.git-users with the format"
+        print "  [user-name] "
+        print "  name = FullName"
+        print "  email = email@address.com"
+        raise Exception("~/.git-users does not exist")
+
+    # Load config file
+    config = ConfigParser.ConfigParser()
+    config.read( [ os.path.expanduser("~/.git-users") ] )
+
+    args = safeArgs( sys.argv )
+    if args[1] == '':
+        raise Exception("Please specify a user to preform as")
+
+    if config.get( args[1], 'name' ):
+        runCmd( 'git config --global user.name "%s"' % config.get( args[1], 'name' ) )
+        runCmd( 'git config --global user.email "%s"' % config.get( args[1], 'email' ) )
+    else:
+        print "-- Unknown user '%s' " % args[1]
+
+    options = quoteArgs( removeArgs( args, [ args[0], args[1], '' ] ) )
+    if options == '':
+        raise Exception( "Set git user as %s" % config.get( args[1], 'name' ) )
+    sys.exit( runCmd( "git %s" % options ) )
+
+except ConfigParser.NoSectionError, e:
+    print "-- Config %s" % e 
+except Exception, e:
+    print "-- %s" % e 
+    sys.exit(-1)
+
+
+    
