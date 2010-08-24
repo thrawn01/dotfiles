@@ -32,10 +32,16 @@ if __name__ == '__main__':
     try:    
         args = safeArgs( sys.argv )
         origin = 'origin'
+        branch = args[1]
         explain = False
 
         if '-h' in args:
             sys.exit( usage() )
+
+        if '-e' in args:
+            explain = True
+
+        args = removeArgs( args, ['-e', '-h' ] )
         
         if args[1] == '':
             print "-- Please specify a remote branch to track" 
@@ -43,13 +49,11 @@ if __name__ == '__main__':
 
         # If the user specifed a remote repo
         if args[2] != '':
-            (origin, branch) = args[1:]
-
-        if '-e' in args:
-            explain = True
+            (origin, branch) = args[1:3]
 
         # Ensure the local branch tracks with the remote branch
-        runCmd( "git branch --track %(branch)s %(origin)s:/%(branch)s" % locals(), explain=explain )
+        runCmd( "git fetch %(origin)s" % locals(), explain=explain )
+        runCmd( "git branch --track %(branch)s %(origin)s/%(branch)s" % locals(), explain=explain )
         runCmd( "git checkout %(branch)s" % locals(), explain=explain )
 
     except Exception, e:
