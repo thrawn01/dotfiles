@@ -2,7 +2,6 @@ import re
 import os
 import commands
 
-return_code = 0
 
 class Struct(object):
     def __init__(self, **args):
@@ -34,9 +33,13 @@ def YesNo( msg, default=None ):
         if re.match( "^(N|n)$", result ):
             return False
 
-def runCmd(cmd, working_dir='', exceptions=False, capture=False ):
-    global return_code
+def runCmd(cmd, working_dir='', exceptions=False, capture=False, explain=False ):
+    return_code = 0
     cwd = ""
+
+    if explain:
+        print "runCmd: %s" % cmd 
+        return return_code
 
     # run command from a specific directory
     if working_dir != '':
