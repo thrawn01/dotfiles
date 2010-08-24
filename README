@@ -1,0 +1,12 @@
+A collection of development tools I've used over the years, all consolidated in one location
+
+=====================
+Installation
+=====================
+
+Run the setup.py 
+
+or 
+
+Copy the scripts to a /bin directory in your path and the 
+/lib files into a directory python can find them
