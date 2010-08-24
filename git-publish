@@ -8,7 +8,7 @@ from utils import safeArgs, runCmd
 def usage():
     print """
 Usage: git publish <remote> [-e] [-h]
-    Assist users with publishing local branches to a remote repo
+    Assist publishing local branches to a remote repo
 
     Example:
         git branch my-branch
