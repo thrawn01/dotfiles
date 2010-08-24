@@ -3,7 +3,32 @@
 import sys, os
 
 sys.path.append( os.path.expanduser("~/bin/lib") )
-from utils import safeArgs, runCmd, removeArgs
+from utils import safeArgs, runCmd
+
+def usage():
+    print """
+Usage: git publish <remote> [-e] [-h]
+    Assist users with publishing local branches to a remote repo
+
+    Example:
+        git branch my-branch
+        git checkout my-branch
+        git publish
+
+    Or you can specify the remote
+        git publish github
+        git publish origin
+
+    Can also be used to push the initial master ( For example, github )
+        git add origin git@github.com:tekkub/help-example.git
+        git publish
+
+    Options:
+         -e   Show the commands to be run, but don't run them
+         -h   This help message
+"""
+    return 0
+
 
 def getBranchName( input ):
     for line in input.split('\n'):
@@ -18,12 +43,15 @@ if __name__ == '__main__':
         args = safeArgs( sys.argv )
         origin = 'origin'
         explain = False
+
+        if '-h' in args:
+            sys.exit( usage() )
         
         # If the user specifed a remote repo
         if args[1] != '':
             origin = args[1]
-            args = removeArgs( args, [ args[1] ] )
 
+        # Explain the actions taken
         if '-e' in args:
             explain = True
 
@@ -34,6 +62,11 @@ if __name__ == '__main__':
         runCmd( "git push %(origin)s %(branch)s:refs/heads/%(branch)s" % locals(), explain=explain )
         # Update the local repo, so it knows about the remote branch
         runCmd( "git fetch %(origin)s" % locals(), explain=explain )
+
+        # No need to track master
+        if branch == 'master':
+            sys.exit(0)
+
         # Ensure the local branch tracks with the remote branch
         runCmd( "git branch --track %(branch)s %(origin)s:/%(branch)s" % locals(), explain=explain )
 
