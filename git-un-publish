@@ -1,0 +1,66 @@
+#! /usr/bin/env python
+
+import sys, os
+
+sys.path.append( os.path.expanduser("~/bin/lib") )
+from utils import safeArgs, runCmd
+
+def usage():
+    print """
+Usage: git un-publish [<remote>] [-e] [-h]
+    Remove remote branches
+
+    Example:
+        git checkout my-branch
+        git un-publish
+
+    Or you can specify the remote
+        git un-publish origin
+        git un-publish github
+
+    Options:
+         -e   Show the commands to be run, but don't run them
+         -h   This help message
+"""
+    return 0
+
+
+def getBranchName( input ):
+    for line in input.split('\n'):
+        if line[0] == '*':
+            return line[2:]
+    raise Exception( "Unable to find branch; Not in a git repo? " )
+
+
+if __name__ == '__main__':
+    
+    try:
+        args = safeArgs( sys.argv )
+        origin = 'origin'
+        explain = False
+
+        if '-h' in args:
+            sys.exit( usage() )
+        
+        # If the user specifed a remote repo
+        if args[1] != '':
+            origin = args[1]
+
+        # Explain the actions taken
+        if '-e' in args:
+            explain = True
+
+        # Get the current branch from git
+        branch = getBranchName( runCmd( "git branch --no-color", capture=True ) )
+
+        # No need to track master
+        if branch == 'master':
+            sys.exit(0)
+
+        # Create the new branch on the remote
+        runCmd( "git push %(origin)s :%(branch)s" % locals(), explain=explain )
+
+    except Exception, e:
+        print "-- Caught - %s " % e 
+        sys.exit(-1)
+
