@@ -24,9 +24,9 @@ git-track - Allows users to track a remote branch so they can commit back to the
 Installation
 =====================
 
-Run setup.py 
+$ python setup.py 
 
-or 
+or to install the scripts in /usr/local
 
-Copy the scripts to a /bin directory in your path and the 
-/lib files into a directory python can find them
+$ python setup.py /usr/local
+
