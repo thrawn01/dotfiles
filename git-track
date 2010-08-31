@@ -2,8 +2,7 @@
 # Change
 import sys, os
 
-sys.path.append( os.path.expanduser("~/bin/lib") )
-from utils import safeArgs, runCmd, removeArgs
+from dev_utils import safeArgs, runCmd, removeArgs
 
 def usage():
     print """
