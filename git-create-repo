@@ -1,0 +1,19 @@
+#! /bin/sh
+
+# Quickly create a git repo with standard ignore options
+
+if [ -e .git ];then
+    echo "Already contains .git dir"
+    exit -1
+fi
+echo "*.pyc" >> .gitignore
+echo "*.pyo" >> .gitignore
+echo "*.so" >> .gitignore
+echo ".svn" >> .gitignore
+echo "target/" >> .gitignore
+echo ".class/" >> .gitignore
+
+git init
+git add .
+git status
+git commit -m "create-repo: Initial Commit" -a 
