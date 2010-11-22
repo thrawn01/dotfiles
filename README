@@ -26,7 +26,7 @@ Installation
 
 $ python setup.py 
 
-or to install the scripts in /usr/local
+or to install the scripts in /usr/local/bin
 
-$ python setup.py /usr/local
+$ python setup.py /usr/local/bin
 
