@@ -53,8 +53,13 @@ if __name__ == "__main__":
     # Get my name
     prog_name = sys.argv[0].lstrip("./")
 
-    # Default install directory to /usr/bin
-    bin_path = '/usr/bin'
+    # Default install directory to ~/bin
+    home_dir = os.environ.get('HOME', '')
+    if home_dir == '':
+        print "-- Could not determine your home directory"
+        sys.exit(-1)
+    
+    bin_path = os.path.join(home_dir, "bin")
 
     # If the user supplied a dest directory, use that instead
     if len(sys.argv) > 1:

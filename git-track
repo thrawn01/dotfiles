@@ -1,7 +1,6 @@
 #! /usr/bin/env python
-# Change
-import sys, os
 
+import sys, os
 from dev_utils import safeArgs, runCmd, removeArgs
 
 def usage():
