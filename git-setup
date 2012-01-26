@@ -1,0 +1,10 @@
+#! /bin/sh
+
+# Setup git with my user info
+git config --global user.name "Derrick J. Wippler"
+git config --global user.email thrawn01@gmail.com
+
+# Use color, cause me like colur! 
+git config --global color.diff auto
+git config --global color.status auto
+git config --global color.branch auto

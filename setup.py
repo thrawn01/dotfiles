@@ -82,12 +82,3 @@ if __name__ == "__main__":
         print " -- ", cmd
         os.system( cmd )
 
-    # Install the module
-    sys.argv = [ prog_name, 'install' ]
-    setup (name = 'dev_utils', 
-              description = "Shared library for a Collection of Development Tools",
-              author = "Derrick J. Wippler",
-              author_email = "thrawn01@gmail.com",
-              version = '1.0', 
-              py_modules = ['dev_utils'] )
-    
