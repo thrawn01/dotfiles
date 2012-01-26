@@ -88,6 +88,7 @@ if __name__ == "__main__":
         os.system( cmd )
 
     os.system('mkdir -p ~/.vim/colors');
+    os.system('mkdir -p ~/.vimswap');
     os.system('cp thrawn.vim ~/.vim/colors');
     os.system('cp vimrc ~/.vimrc');
     os.system('cp gvimrc ~/.gvimrc');
