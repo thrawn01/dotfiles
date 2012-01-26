@@ -77,7 +77,7 @@ if __name__ == "__main__":
     for file in list:
 
         # Skip the setup.py program
-        if skipable(file, [ 'dev-utils.py', prog_name, '.swp', '^\.' ] ):
+        if skipable(file, [ 'dev-utils.py', prog_name, '.swp', '^\.', '\.vim', 'rc$', 'README' ] ):
             continue
 
         # Some file need to be linked as different names
@@ -86,4 +86,30 @@ if __name__ == "__main__":
         cmd = "cp -f %s/%s %s/%s" % ( os.getcwd(), file, bin_path, newName )
         print " -- ", cmd
         os.system( cmd )
+
+    os.system('mkdir -p ~/.vim/colors');
+    os.system('cp thrawn.vim ~/.vim/colors');
+    os.system('cp vimrc ~/.vimrc');
+    os.system('cp gvimrc ~/.gvimrc');
+
+    # Print out 
+    print """
+# Add this to .bashrc or .bash_profile
+export PATH="$PATH:~/bin"
+alias gvim='~/bin/gvim-tabs.py'
+
+# OSX X11 Timeout Issue
+#ForwardX11Timeout 596h
+alias ssh='ssh -X'
+
+# Leet Promptness
+C0="\[\e[0m\]"
+C1="\[\e[1;30m\]" # <- subdued color
+C2="\[\e[1;37m\]" # <- regular color
+C3="\[\e[1;32m\]" # <- hostname color
+C4="\[\e[1;34m\]" # <- seperator color (..[ ]..)
+#PROMPT='\$'                                    
+PROMPT='>'
+export PS1="$C3$C4..( $C2\u$C1@$C3\h$C1($C2\l$C1): $C2\w$C1$C1 : $C2\\t$C1 $C4)..\\n$C3$C2$PROMPT$C1$PROMPT$C0 "
+"""
 
