@@ -66,9 +66,6 @@ if __name__ == '__main__':
         if branch == 'master':
             sys.exit(0)
 
-        # Ensure the local branch tracks with the remote branch
-        runCmd( "git branch --track %(branch)s %(origin)s:/%(branch)s" % locals(), explain=explain )
-
     except Exception, e:
         print "-- Caught - %s " % e 
         sys.exit(-1)
