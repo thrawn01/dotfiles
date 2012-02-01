@@ -39,7 +39,7 @@ if __name__ == '__main__':
         branch = runCmd("git name-rev --name-only HEAD", capture=True).rstrip()
         if branch == '':
             print "-- Could not determine local branch name; not in a git repo?"
-            sys.exit(-1)
+            sys.exit(1)
             
         runCmd( "git fetch %(remote)s" % locals(), explain=explain )
         runCmd( "git checkout master", explain=explain )
@@ -49,5 +49,5 @@ if __name__ == '__main__':
 
     except Exception, e:
         print "-- Caught - %s " % e 
-        sys.exit(-1)
+        sys.exit(1)
 

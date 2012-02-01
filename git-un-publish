@@ -13,8 +13,8 @@ Usage: git un-publish [<remote>] [-e] [-h]
         git checkout my-branch
         git un-publish
 
-    Or you can specify the remote
-        git un-publish origin
+    Or you can specify the remote branch or origin
+        git un-publish origin my-branch
         git un-publish github
 
     Options:
@@ -24,15 +24,8 @@ Usage: git un-publish [<remote>] [-e] [-h]
     return 0
 
 
-def getBranchName( input ):
-    for line in input.split('\n'):
-        if line[0] == '*':
-            return line[2:]
-    raise Exception( "Unable to find branch; Not in a git repo? " )
-
-
 if __name__ == '__main__':
-    
+
     try:
         args = safeArgs( sys.argv )
         origin = 'origin'
@@ -50,16 +43,24 @@ if __name__ == '__main__':
             explain = True
 
         # Get the current branch from git
-        branch = getBranchName( runCmd( "git branch --no-color", capture=True ) )
+        branch = runCmd("git name-rev --name-only HEAD", capture=True).rstrip()
+        if branch == '':
+            print "-- Could not determine local branch name; not in a git repo?"
+            sys.exit(1)
+
+        # If the user specifed a branch
+        if args[2] != '':
+            branch = args[2]
 
         # No need to track master
         if branch == 'master':
-            sys.exit(0)
+            print "-- Refusing to un-publish master"
+            sys.exit(1)
 
         # Create the new branch on the remote
         runCmd( "git push %(origin)s :%(branch)s" % locals(), explain=explain )
 
     except Exception, e:
         print "-- Caught - %s " % e 
-        sys.exit(-1)
+        sys.exit(1)
 
