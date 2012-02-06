@@ -42,6 +42,10 @@ if __name__ == '__main__':
         # If the user specifed a remote repo
         if args[1] != '':
             origin = args[1]
+        
+        # Your doing it wrong again
+        if args[2] != '':
+            sys.exit( usage() )
 
         # Explain the actions taken
         if '-e' in args:
