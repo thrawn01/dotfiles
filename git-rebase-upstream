@@ -43,7 +43,7 @@ if __name__ == '__main__':
             
         runCmd( "git fetch %(remote)s" % locals(), explain=explain )
         runCmd( "git checkout master", explain=explain )
-        runCmd( "git pull %(remote)s master" % locals(), explain=explain )
+        runCmd( "git merge %(remote)s/master" % locals(), explain=explain )
         runCmd( "git checkout %(branch)s" % locals(), explain=explain )
         runCmd( "git rebase master", explain=explain )
 
