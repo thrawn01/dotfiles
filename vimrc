@@ -30,8 +30,9 @@ set guioptions-=T
 set mousemodel=popup
 set hlsearch
 set autoindent
-"set tags=~/.vim/tags/webtrack
+set tags=~/.vim/tags
 filetype on
+let python_highlight_all = 1
 
 " Make shift-insert work like in Xterm
 map <S-Insert> <MiddleMouse>
