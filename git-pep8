@@ -29,7 +29,7 @@ if __name__ == '__main__':
         if '-e' in args:
             explain = True
 
-        for line in runCmd("git status --porcelain", capture=True).split('\n'):
+        for line in runCmd("git status -s", capture=True).split('\n'):
             (status, file) = line.split()
             if status.strip() != '??':
                 print "--- pep8 %s" % file
