@@ -1,12 +1,14 @@
 #! /usr/bin/env python
 
-import sys, os
 from dev_utils import safeArgs, runCmd, removeArgs
+import sys
+import os
+
 
 def usage():
     print """
 Usage: git track [<origin>] <remote> [-e] [-h]
-    Assist tracking remote branches which allows 
+    Assist tracking remote branches which allows
     colaborators to push back to the branch later
 
     Example:
@@ -17,44 +19,44 @@ Usage: git track [<origin>] <remote> [-e] [-h]
 
     Specify an origin
         git track origin remote-branch
-        git track github remote-branch 
-    
+        git track github remote-branch
+
     Options:
          -e   Show the commands to be run, but don't run them
          -h   This help message
 """
     return 0
-    
+
 if __name__ == '__main__':
 
-    try:    
-        args = safeArgs( sys.argv )
+    try:
+        args = safeArgs(sys.argv)
         origin = 'origin'
         branch = args[1]
         explain = False
 
         if '-h' in args:
-            sys.exit( usage() )
+            sys.exit(usage())
 
         if '-e' in args:
             explain = True
 
-        args = removeArgs( args, ['-e', '-h' ] )
-        
+        args = removeArgs(args, ['-e', '-h'])
+
         if args[1] == '':
-            print "-- Please specify a remote branch to track" 
-            sys.exit( usage() )
+            print "-- Please specify a remote branch to track"
+            sys.exit(usage())
 
         # If the user specifed a remote repo
         if args[2] != '':
             (origin, branch) = args[1:3]
 
         # Ensure the local branch tracks with the remote branch
-        runCmd( "git fetch %(origin)s" % locals(), explain=explain )
-        runCmd( "git branch --track %(branch)s %(origin)s/%(branch)s" % locals(), explain=explain )
-        runCmd( "git checkout %(branch)s" % locals(), explain=explain )
+        runCmd("git fetch %(origin)s" % locals(), explain=explain)
+        runCmd("git branch --track %(branch)s %(origin)s/%(branch)s"
+                % locals(), explain=explain)
+        runCmd("git checkout %(branch)s" % locals(), explain=explain)
 
     except Exception, e:
-        print "-- Caught - %s " % e 
+        print "-- Caught - %s " % e
         sys.exit(-1)
-
