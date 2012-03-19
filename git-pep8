@@ -1,40 +1,22 @@
 #! /usr/bin/env python
 
-from dev_utils import safeArgs, runCmd, removeArgs
+from subprocess import check_output, call
+from optparse import OptionParser
 import sys
-import os
-
-
-def usage():
-    print """
-Usage: git pep8 [-e] [-h]
-    Run pep8 against all files staged for commit
-
-    Options:
-         -e   Show the commands to be run, but don't run them
-         -h   This help message
-"""
-    return 0
 
 
 if __name__ == '__main__':
 
-    try:
-        args = safeArgs(sys.argv)
-        explain = False
+    usage = "Usage: %prog [-h]"
+    description = "run pep8 against all files staged for commit"
+    parser = OptionParser(usage=usage, description=description)
+    options, args = parser.parse_args()
 
-        if '-h' in args:
-            sys.exit(usage())
-
-        if '-e' in args:
-            explain = True
-
-        for line in runCmd("git status -s", capture=True).split('\n'):
+    for line in check_output("git status -s", shell=True).split('\n'):
+        try:
             (status, file) = line.split()
             if status.strip() != '??':
                 print "--- pep8 %s" % file
-                runCmd("pep8 %s" % file, explain=explain)
-
-    except Exception, e:
-        print "-- Caught - %s " % e
-        sys.exit(-1)
+                call("pep8 %s" % file, shell=True)
+        except ValueError:
+            pass
