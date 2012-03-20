@@ -51,8 +51,8 @@ if __name__ == '__main__':
     branch = args[0]
 
     # If the user also specifed a remote repo
-    if args[2]:
-        (remote, branch) = args[1:3]
+    if args[1]:
+        (remote, branch) = args[0:2]
 
     # Ensure the local branch tracks with the remote branch
     run("git fetch %(remote)s" % locals(), options.explain)
