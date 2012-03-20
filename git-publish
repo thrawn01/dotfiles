@@ -44,7 +44,7 @@ if __name__ == '__main__':
     args = SafeDict(args)
 
     # If the user specifed a remote repo
-    remote = args[1] or 'origin'
+    remote = args[0] or 'origin'
 
     # Get the current branch from git
     branch = check_output("git name-rev --name-only HEAD", shell=True).rstrip()
@@ -53,7 +53,7 @@ if __name__ == '__main__':
         sys.exit(1)
 
     # Or use the branch specifed by the user
-    branch = args[2] or branch
+    branch = args[1] or branch
 
     # No need to track master
     if branch == 'master':

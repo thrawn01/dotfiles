@@ -1,66 +1,65 @@
 #! /usr/bin/env python
 
-import sys, os
+import sys
+from optparse import IndentedHelpFormatter, OptionParser
+from subprocess import check_output, call
 
-from dev_utils import safeArgs, runCmd
 
-def usage():
-    print """
-Usage: git un-publish [<remote>] [-e] [-h]
-    Remove remote branches
+class DescFormatter(IndentedHelpFormatter):
 
-    Example:
-        git checkout my-branch
-        git un-publish
+    def format_description(self, description):
+        return "Remove remote branches\n"\
+               "\n"\
+               "Example:\n"\
+               "     git checkout my-branch\n"\
+               "     git un-publish\n"\
+               "\n"\
+               "Or you can specify the remote branch\n"\
+               "     git un-publish origin my-branch\n"\
+               "Or you can specify just the remote, un-publish \n"\
+               "will then delete the current branch on 'github'\n"\
+               "     git un-publish github\n"
 
-    Or you can specify the remote branch or origin
-        git un-publish origin my-branch
-        git un-publish github
 
-    Options:
-         -e   Show the commands to be run, but don't run them
-         -h   This help message
-"""
-    return 0
+class SafeDict(list):
+    def __getitem__(self, key):
+        try:
+            return list.__getitem__(self, key)
+        except IndexError:
+            return None
+
+
+def run(cmd, explain):
+    if not explain:
+        return call(cmd, shell=True)
+    print "-- ", cmd
 
 
 if __name__ == '__main__':
+    parser = OptionParser(usage="Usage: %prog [-h]",
+                formatter=DescFormatter(), description=' ')
+    parser.add_option('-e', '--explain', const=True, action='store_const',
+            help="print commands to be executed, instead of executing them")
 
-    try:
-        args = safeArgs( sys.argv )
-        origin = 'origin'
-        explain = False
+    options, args = parser.parse_args()
+    args = SafeDict(args)
 
-        if '-h' in args:
-            sys.exit( usage() )
-        
-        # If the user specifed a remote repo
-        if args[1] != '':
-            origin = args[1]
+    # If the user specifed a remote repo
+    remote = args[0] or 'origin'
 
-        # Explain the actions taken
-        if '-e' in args:
-            explain = True
-
-        # Get the current branch from git
-        branch = runCmd("git name-rev --name-only HEAD", capture=True).rstrip()
-        if branch == '':
-            print "-- Could not determine local branch name; not in a git repo?"
-            sys.exit(1)
-
-        # If the user specifed a branch
-        if args[2] != '':
-            branch = args[2]
-
-        # No need to track master
-        if branch == 'master':
-            print "-- Refusing to un-publish master"
-            sys.exit(1)
-
-        # Create the new branch on the remote
-        runCmd( "git push %(origin)s :%(branch)s" % locals(), explain=explain )
-
-    except Exception, e:
-        print "-- Caught - %s " % e 
+    # Get the current branch from git
+    branch = check_output("git name-rev --name-only HEAD", shell=True).rstrip()
+    if branch == '':
+        print "-- Could not determine local branch name; not in a git repo?"
         sys.exit(1)
 
+    # If the user specifed a branch
+    branch = args[1] or branch
+
+    # No need to un-publish master
+    if branch == 'master':
+        print "-- Refusing to un-publish master"
+        sys.exit(1)
+
+    # Delete the branch on the remote
+    run("git push %(remote)s :%(branch)s" % locals(), options.explain)
