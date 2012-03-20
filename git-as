@@ -1,61 +1,93 @@
 #! /usr/bin/env python
 
-# ---------------------------------------
-# For users on a pairing station that both use git
-# The script allow you specify what user you want 
-# to to preform git actions under
-# 
-# Example:
-#   git as derrick commit -m "This is a commit by derrick"
-#   git as nathen commit -m "This is a commit by nathen"
-#   git as ryan commit -m "This is a commit by ryan"
-#
-# Or if you want to change users for all the following commands
-#   git as derrick 
-#   git commit -m "This is a commit by derrick"
-#
-# Installation
-#   Run the setup.py script in my project 
-#   Or
-#   Copy this file to a ~/bin directory in your path and the /lib files needed
-# ---------------------------------------
-
-import sys, os, ConfigParser
-
-from dev_utils import safeArgs, quoteArgs, removeArgs, runCmd
-
-try:
-    if not os.path.exists( os.path.expanduser("~/.git-users") ):
-        print "Please create a ini file called ~/.git-users with the format"
-        print "  [user-name] "
-        print "  name = FullName"
-        print "  email = email@address.com"
-        raise Exception("~/.git-users does not exist")
-
-    # Load config file
-    config = ConfigParser.ConfigParser()
-    config.read( [ os.path.expanduser("~/.git-users") ] )
-
-    args = safeArgs( sys.argv )
-    if args[1] == '':
-        raise Exception("Please specify a user to preform as")
-
-    if config.get( args[1], 'name' ):
-        runCmd( 'git config user.name "%s"' % config.get( args[1], 'name' ) )
-        runCmd( 'git config user.email "%s"' % config.get( args[1], 'email' ) )
-    else:
-        print "-- Unknown user '%s' " % args[1]
-
-    options = quoteArgs( removeArgs( args, [ args[0], args[1], '' ] ) )
-    if options == '':
-        raise Exception( "Set git user as %s" % config.get( args[1], 'name' ) )
-    sys.exit( runCmd( "git %s" % options ) )
-
-except ConfigParser.NoSectionError, e:
-    print "-- Config %s" % e 
-except Exception, e:
-    print "-- %s" % e 
-    sys.exit(-1)
+from optparse import IndentedHelpFormatter, OptionParser
+from ConfigParser import ConfigParser, NoSectionError
+from os.path import exists, expanduser
+from subprocess import call
+import sys
+import re
 
 
-    
+class SafeList(list):
+    def __getitem__(self, key):
+        try:
+            return list.__getitem__(self, key)
+        except IndexError:
+            return None
+
+
+def usage():
+    print "Usage: git-as [USER] [GIT-COMMAND] [GIT-OPTIONS....]\n"\
+          "\n"\
+          "git-as allows you specify what user you want\n"\
+          "to preform git actions as (Designed for users on \n"\
+          "a pairing station that both use git)\n"\
+          "\n"\
+          " Example:\n"\
+          "   git as derrick commit -m \"This is a commit by derrick\"\n"\
+          "   git as nathen commit -m \"This is a commit by nathen\"\n"\
+          "   git as ryan commit -m \"This is a commit by ryan\"\n"\
+          "\n"\
+          " Or if you want to change users for all the following commands\n"\
+          "   git as derrick \n"\
+          "   git commit -m \"This is a commit by derrick\"\n"
+    return -1
+
+
+def quoteArgs(argv):
+    args = []
+    for arg in argv:
+        # Quote args with spaces in them
+        if re.search(' ', arg):
+            args.append(("\"%s\"" % arg))
+            continue
+        args.append(arg)
+    return " ".join(args)
+
+
+def removeArgs(argv, remove):
+    args = []
+    for arg in argv:
+        # Skip these arguments
+        if arg in remove:
+            continue
+        args.append(arg)
+    return args
+
+
+def run(cmd):
+    return call(cmd, shell=True)
+
+
+if __name__ == '__main__':
+
+    try:
+        args = SafeList(sys.argv)
+        if not args[1]:
+            print " -- Please specify a user to preform as"
+            sys.exit(usage())
+
+        if not exists(expanduser("~/.git-users")):
+            print "Create a ini file called ~/.git-users with the format"
+            print "  [user-name] "
+            print "  name = FullName"
+            print "  email = email@address.com"
+            raise Exception("~/.git-users does not exist")
+
+        # Load config file
+        conf = ConfigParser()
+        conf.read([expanduser("~/.git-users")])
+
+        run('git config user.name "%s"' % conf.get(args[1], 'name'))
+        run('git config user.email "%s"' % conf.get(args[1], 'email'))
+
+        options = quoteArgs(removeArgs(args, [args[0], args[1], '']))
+        if options == '':
+            print "-- Set git user to %s" % conf.get(args[1], 'name')
+            sys.exit(0)
+
+        sys.exit(run("git %s" % options))
+
+    except NoSectionError, e:
+        print "-- no user section '%s' in ~/.git-users" % e.section
+        sys.exit(usage())
