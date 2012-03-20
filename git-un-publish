@@ -21,7 +21,7 @@ class DescFormatter(IndentedHelpFormatter):
                "     git un-publish github\n"
 
 
-class SafeDict(list):
+class SafeList(list):
     def __getitem__(self, key):
         try:
             return list.__getitem__(self, key)
@@ -42,7 +42,7 @@ if __name__ == '__main__':
             help="print commands to be executed, instead of executing them")
 
     options, args = parser.parse_args()
-    args = SafeDict(args)
+    args = SafeList(args)
 
     # If the user specifed a remote repo
     remote = args[0] or 'origin'
