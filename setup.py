@@ -108,7 +108,7 @@ alias gvim='~/bin/gvim-tabs.py'
 alias ssh='ssh -X'
 
 function current_branch() {
-    git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'
+    git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\\1/'
 }
 
 # Leet Promptness
