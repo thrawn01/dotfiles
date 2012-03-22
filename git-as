@@ -56,7 +56,9 @@ def removeArgs(argv, remove):
 
 
 def run(cmd):
-    return call(cmd, shell=True)
+    if call(cmd, shell=True):
+        print "Command '%s' returned non-zero exit status" % cmd
+        sys.exit(1)
 
 
 if __name__ == '__main__':
