@@ -30,11 +30,11 @@ class DescFormatter(IndentedHelpFormatter):
 
 
 def run(cmd, explain):
-    if not explain:
-        if call(cmd, shell=True):
-            print "Command '%s' returned non-zero exit status" % cmd
-            sys.exit(1)
-    print "-- ", cmd
+    if explain:
+        return sys.stdout.write("-- %s\n" % cmd)
+    if call(cmd, shell=True):
+        print "Command '%s' returned non-zero exit status" % cmd
+        sys.exit(1)
 
 
 if __name__ == '__main__':
