@@ -1,0 +1,145 @@
+#! /usr/bin/env python
+
+from subprocess import check_output, call
+from pprint import pprint
+import logging
+import sys
+import re
+
+
+log = logging.getLogger('git-wtf')
+
+
+class GitWtf(object):
+
+    def __init__(self):
+        self.explain = False
+
+    def run(self, cmd):
+        if self.explain:
+            return sys.stdout.write("-- %s\n" % cmd)
+        if call(cmd, shell=True):
+            print "Command '%s' returned non-zero exit status" % cmd
+            sys.exit(1)
+
+    def commits_between(self, _from, to, branch=''):
+        self.run("git log %s --pretty='- [%%h] %%s' %s..%s" % (branch, _from, to))
+
+    def remotes(self):
+        result = {}
+        remotes = check_output("git config --get-regexp ^remote\.\*\.url", shell=True).rstrip()
+        for line in remotes.split('\n'):
+            match = re.match('^remote\.(.+?)\.url (.+)$', line)
+            if match:
+                result[match.group(1)] = match.group(2)
+        return result
+
+    def tracked(self):
+        result = {}
+        tracked = check_output("git config --get-regexp ^branch\.", shell=True).rstrip()
+
+        for line in tracked.split('\n'):
+            # If this line has a remote branch name
+            match = re.match('branch\.(.*?)\.remote (.+)', line)
+            if match:
+                result.setdefault(match.group(1), {})['remote'] = match.group(2)
+                next
+            # If this line has a merge path
+            match = re.match('branch\.(.*?)\.merge ((refs\/)?heads\/)?(.+)', line)
+            if match:
+                result.setdefault(match.group(1), {})['merge'] = match.group(2)
+                next
+        return result
+
+    def branches(self):
+        result = {}
+        branches = check_output("git show-ref", shell=True).rstrip()
+
+        for line in branches.split('\n'):
+            sha, ref = line.split(" refs/")
+            # Matched a local branch
+            match = re.match('^heads\/(.+)$', ref)
+            if match:
+                head = result.setdefault('local', {})
+                # Record the last commit in the branch, and the ref location
+                head[match.group(1)] = {'ref': ref, 'sha': sha}
+            # Matched a remote branch
+            match = re.match('^remotes\/(.+?)\/(.+)$', ref)
+            if match:
+                remote = result.setdefault(match.group(1), {})
+                # Record the last commit in the branch, and the ref location
+                remote[match.group(2)] = {'ref': ref, 'sha': sha}
+        return result
+
+    def find_remotes(self, branch, all):
+            result = []
+            for remote, branches in all.items():
+                if remote == 'local':
+                    continue
+                if branch in branches:
+                    result.append(branches[branch])
+            return result
+
+    def status(self):
+        local = {}
+
+        # List tracked branches
+        tracked = self.tracked()
+        # List all branches
+        all = self.branches()
+
+        # Build a tree of information about our local branches
+        for remote, branches in all.items():
+            # Only interested in local branches
+            if remote != 'local':
+                continue
+
+            # for all the local branches
+            for branch, status in branches.items():
+                # If the branch is tracking a remote branch
+                if branch in tracked.keys():
+                    status['tracked'] = tracked[branch]
+                # Find remote branches with the same name,
+                # assume they are remotes of our local branch
+                status['remotes'] = self.find_remotes(branch, all)
+                local[branch] = status
+        # Return a dict of local branches with all available stat info
+        return local
+
+    def not_uptodate(self, sha, info):
+        result = []
+        for remote in info['remotes']:
+            if sha != remote['sha']:
+                result.append(remote)
+        return result
+
+    def wtf(self):
+        status = self.status()
+        for key, value in status.items():
+            # Print the branch name and remote that it's tracking
+            branch = "%s" % key
+            if 'tracked' in value:
+                branch = "%s [%s]" % (key, value['tracked']['remote'])
+            print branch
+            # Return remotes that are not up to date
+            remotes = self.not_uptodate(value['sha'], value)
+            if not remotes:
+                print "    Up to Date"
+            # Figure out how many commits we are behind
+            # OR
+            # Figure out how many commits we are ahead
+
+
+def main():
+    wtf = GitWtf()
+    logging.basicConfig(format='-- %(message)s')
+    log.setLevel(logging.INFO)
+    #pprint(wtf.branches())
+    #pprint(wtf.status())
+    wtf.wtf()
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())
+
