@@ -9,6 +9,23 @@ import re
 
 log = logging.getLogger('git-wtf')
 
+def red(s):
+    return "\033[31m%s\033[0m" % s
+
+def green(s):
+    return "\033[32m%s\033[0m" % s
+
+def yellow(s):
+    return "\033[33m%s\033[0m" % s
+
+def cyan(s):
+    return "\033[36m%s\033[0m" % s
+
+def grey(s):
+    return "\033[1;30m%s\033[0m" % s
+
+def purple(s):
+    return "\033[35m%s\033[0m" % s
 
 class GitWtf(object):
 
@@ -22,8 +39,12 @@ class GitWtf(object):
             print "Command '%s' returned non-zero exit status" % cmd
             sys.exit(1)
 
-    def commits_between(self, _from, to, branch=''):
-        self.run("git log %s --pretty='- [%%h] %%s' %s..%s" % (branch, _from, to))
+    def commits_between(self, branch, _from, to):
+        if _from == to:
+            return []
+        cmd = "git log %s --pretty='- [%%h] %%s' %s..%s" % (branch, _from, to)
+        commits = check_output(cmd, shell=True).rstrip()
+        return commits.split('\n')
 
     def remotes(self):
         result = {}
@@ -43,12 +64,12 @@ class GitWtf(object):
             match = re.match('branch\.(.*?)\.remote (.+)', line)
             if match:
                 result.setdefault(match.group(1), {})['remote'] = match.group(2)
-                next
+                continue
             # If this line has a merge path
             match = re.match('branch\.(.*?)\.merge ((refs\/)?heads\/)?(.+)', line)
             if match:
-                result.setdefault(match.group(1), {})['merge'] = match.group(2)
-                next
+                result.setdefault(match.group(1), {})['merge'] = line.split(' ')[1]
+                continue
         return result
 
     def branches(self):
@@ -71,14 +92,33 @@ class GitWtf(object):
                 remote[match.group(2)] = {'ref': ref, 'sha': sha}
         return result
 
-    def find_remotes(self, branch, all):
-            result = []
-            for remote, branches in all.items():
-                if remote == 'local':
-                    continue
-                if branch in branches:
-                    result.append(branches[branch])
-            return result
+    def find_remotes(self, branch, status, all):
+        result = []
+        for remote, branches in all.items():
+            if remote == 'local':
+                continue
+            if branch in branches:
+                # If this is our master, and we found our masters origin
+                if branch == 'master' and status['tracked']['remote'] == remote:
+                    return [branches[branch]]
+                # append the branch info to the list of remotes
+                result.append(branches[branch])
+        return result
+
+    def find_tracked(self, branch, status, tracked, all):
+        result = []
+        info = tracked[branch]
+        # Only include tracked branch if the remote name differs
+        # TODO: Remove this if statement, might be better then find_remotes()
+        if not info['merge'].endswith(branch):
+            # Get the remote name from the ref
+            match = re.match('((refs\/)?heads\/)?(.+)', info['merge'])
+            remote_name = match.group(3)
+            # Add this branch to our tracked info
+            status['tracked'] = info
+            # Add this branch to our remotes
+            status['remotes'].append(all[info['remote']][remote_name])
+        return status
 
     def status(self):
         local = {}
@@ -101,17 +141,14 @@ class GitWtf(object):
                     status['tracked'] = tracked[branch]
                 # Find remote branches with the same name,
                 # assume they are remotes of our local branch
-                status['remotes'] = self.find_remotes(branch, all)
+                # (This might result in false positives)
+                status['remotes'] = self.find_remotes(branch, status, all)
+                # Find tracked branches, even if the branch 
+                # name doesn't match the remote branch name
+                status = self.find_tracked(branch, status, tracked, all)
                 local[branch] = status
         # Return a dict of local branches with all available stat info
         return local
-
-    def not_uptodate(self, sha, info):
-        result = []
-        for remote in info['remotes']:
-            if sha != remote['sha']:
-                result.append(remote)
-        return result
 
     def wtf(self):
         status = self.status()
@@ -119,23 +156,25 @@ class GitWtf(object):
             # Print the branch name and remote that it's tracking
             branch = "%s" % key
             if 'tracked' in value:
-                branch = "%s [%s]" % (key, value['tracked']['remote'])
+                branch = "%s [%s]" % (yellow(key), value['tracked']['remote'])
             print branch
-            # Return remotes that are not up to date
-            remotes = self.not_uptodate(value['sha'], value)
-            if not remotes:
-                print "    Up to Date"
-            # Figure out how many commits we are behind
-            # OR
-            # Figure out how many commits we are ahead
+            for remote in value['remotes']:
+                print "     %s" % remote['ref'],
+                #print "         Sha: %s" % remote['sha']
+                #print "       local: %s" % value['sha']
+                behind = self.commits_between(key, remote['sha'], value['sha'])
+                if behind:
+                    print green("is %d commit behind" % len(behind))
+                    continue
+                ahead = self.commits_between(key, value['sha'], remote['sha'])
+                if ahead:
+                    print red("is %d commit ahead" % len(ahead))
+                    continue
+                print ""
 
 
 def main():
     wtf = GitWtf()
-    logging.basicConfig(format='-- %(message)s')
-    log.setLevel(logging.INFO)
-    #pprint(wtf.branches())
-    #pprint(wtf.status())
     wtf.wtf()
     return 0
 
