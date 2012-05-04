@@ -44,6 +44,8 @@ class GitWtf(object):
             return []
         cmd = "git log %s --pretty='- [%%h] %%s' %s..%s" % (branch, _from, to)
         commits = check_output(cmd, shell=True).rstrip()
+        if commits.rstrip() == '':
+            return []
         return commits.split('\n')
 
     def remotes(self):
@@ -107,7 +109,11 @@ class GitWtf(object):
 
     def find_tracked(self, branch, status, tracked, all):
         result = []
-        info = tracked[branch]
+        try:
+            info = tracked[branch]
+        except KeyError:
+            return status
+
         # Only include tracked branch if the remote name differs
         # TODO: Remove this if statement, might be better then find_remotes()
         if not info['merge'].endswith(branch):
@@ -164,11 +170,11 @@ class GitWtf(object):
                 #print "       local: %s" % value['sha']
                 behind = self.commits_between(key, remote['sha'], value['sha'])
                 if behind:
-                    print green("is %d commit behind" % len(behind))
+                    print green("is %d commits behind" % len(behind))
                     continue
                 ahead = self.commits_between(key, value['sha'], remote['sha'])
                 if ahead:
-                    print red("is %d commit ahead" % len(ahead))
+                    print red("is %d commits ahead" % len(ahead))
                     continue
                 print ""
 
