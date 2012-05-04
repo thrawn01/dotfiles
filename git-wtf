@@ -160,7 +160,7 @@ class GitWtf(object):
         status = self.status()
         for key, value in status.items():
             # Print the branch name and remote that it's tracking
-            branch = gray("%s" % key)
+            branch = grey("%s" % key)
             if 'tracked' in value:
                 branch = "%s [%s]" % (yellow(key), value['tracked']['remote'])
             print branch
