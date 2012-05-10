@@ -27,6 +27,7 @@ def grey(s):
 def purple(s):
     return "\033[35m%s\033[0m" % s
 
+
 class GitWtf(object):
 
     def __init__(self):
@@ -100,9 +101,6 @@ class GitWtf(object):
             if remote == 'local':
                 continue
             if branch in branches:
-                # If this is our master, and we found our masters origin
-                if branch == 'master' and status['tracked']['remote'] == remote:
-                    return [branches[branch]]
                 # append the branch info to the list of remotes
                 result.append(branches[branch])
         return result
@@ -156,18 +154,28 @@ class GitWtf(object):
         # Return a dict of local branches with all available stat info
         return local
 
+    def ahead_behind(self, master, branch):
+        ahead = self.commits_between('master', master, branch)
+        behind = self.commits_between('master', branch, master)
+        #return "%s ahead / %s behind" % (green(str(len(ahead))), red(str(len(behind))))
+        return "%d/%d" % (len(ahead), len(behind))
+
     def wtf(self):
         status = self.status()
         for key, value in status.items():
             # Print the branch name and remote that it's tracking
-            branch = grey("%s" % key)
+            branch = yellow("%s" % key)
+            follow, tracked = ('', '')
+
             if 'tracked' in value:
-                branch = "%s [%s]" % (yellow(key), value['tracked']['remote'])
-            print branch
+                tracked = " [%s]" % value['tracked']['remote']
+            if key != 'master':
+                follow = " (%s)" % self.ahead_behind(status['master']['sha'], value['sha'])
+
+            print "%s%s%s" % (branch, follow, tracked)
+
             for remote in value['remotes']:
                 print "     %s" % remote['ref'],
-                #print "         Sha: %s" % remote['sha']
-                #print "       local: %s" % value['sha']
                 behind = self.commits_between(key, remote['sha'], value['sha'])
                 if behind:
                     print green("is %d commits behind" % len(behind))
