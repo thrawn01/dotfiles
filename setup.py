@@ -97,6 +97,12 @@ if __name__ == "__main__":
     call('cp vimrc ~/.vimrc', shell=True)
     call('cp gvimrc ~/.gvimrc', shell=True)
 
+    call('git config --global color.diff auto')
+    call('git config --global color.status auto')
+    call('git config --global color.branch auto')
+    call('git config --global user.name "Derrick J. Wippler"')
+    call('git config --global user.email thrawn01@gmail.com')
+
     # Print out
     print """
 # Add this to .bashrc or .bash_profile
