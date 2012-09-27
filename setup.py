@@ -126,3 +126,7 @@ C4="\[\e[1;34m\]" # <- seperator color (..[ ]..)
 PROMPT='>'
 export PS1="$C3$C4..( $C2\u$C1@$C3\h$C1 ($C2\$(current_branch)$C1): $C2\w$C1$C1 : $C2\t$C1 $C4)..\n$C3$C2$PROMPT$C1$PROMPT$C0 "
 """
+
+    print " -- Modify This line in /etc/sudoers"
+    print "%sudo	ALL=(ALL:ALL) NOPASSWD: ALL"
+    #TODO: Should also install the public key
