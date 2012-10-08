@@ -10,14 +10,14 @@ import os
 
 
 def ipAddress(interface):
-    for line in check_output(['ifconfig', interface]).split('\n'):
+    for line in check_output(['/sbin/ifconfig', interface]).split('\n'):
         match = re.search('(inet addr:)(\S*)', line)
         if match:
             return match.group(2)
 
 
 def findInterface():
-    for line in check_output('ifconfig').split('\n'):
+    for line in check_output('/sbin/ifconfig').split('\n'):
         match = re.match('^eth\d', line)
         if match:
             return match.group()
