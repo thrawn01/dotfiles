@@ -27,7 +27,6 @@ def findInterface():
 def load(address):
     try:
         with open("%s/.dynip-address" % os.environ['HOME'], 'r') as file:
-            print file.name
             return file.read()
     except IOError:
         return ''
