@@ -91,11 +91,16 @@ if __name__ == "__main__":
         print " -- ", cmd
         call(cmd, shell=True)
 
-    call('mkdir -p ~/.vim/colors', shell=True)
+    call('mkdir -p ~/.vim', shell=True)
     call('mkdir -p ~/.vimswap', shell=True)
-    call('cp thrawn.vim ~/.vim/colors', shell=True)
+    call('cd vim; tar -vcf - . | $( cd ~/.vim; tar -vxf - )', shell=True)
     call('cp vimrc ~/.vimrc', shell=True)
     call('cp gvimrc ~/.gvimrc', shell=True)
+
+    # SSH
+    call('mkdir -p ~/.ssh', shell=True)
+    call('chmod u+rwx,go-rwx ~/.ssh', shell=True)
+    call('cd ssh; tar -vcf - . | $( cd ~/.ssh; tar -vxf - )', shell=True)
 
     call('git config --global color.diff auto', shell=True)
     call('git config --global color.status auto', shell=True)
@@ -103,7 +108,6 @@ if __name__ == "__main__":
     call('git config --global user.name "Derrick J. Wippler"', shell=True)
     call('git config --global user.email thrawn01@gmail.com', shell=True)
 
-    # Print out
     print """
 # Add this to .bashrc or .bash_profile
 export PATH="$PATH:~/bin"
@@ -129,4 +133,3 @@ export PS1="$C3$C4..( $C2\u$C1@$C3\h$C1 ($C2\$(current_branch)$C1): $C2\w$C1$C1 
 
     print " -- Modify This line in /etc/sudoers"
     print "%sudo	ALL=(ALL:ALL) NOPASSWD: ALL"
-    #TODO: Should also install the public key
