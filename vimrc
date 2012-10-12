@@ -17,22 +17,26 @@
 " set guifont=-misc-fixed-medium-r-normal--14-130-75-75-c-70-iso8859-1
 
 set ch=2		" Make command line two lines high
-
 set mousehide		" Hide the mouse when typing text
 set dir=~/.vimswap
 set expandtab
 set shiftwidth=4
 set tabstop=4
 set nowrap
-syntax on
 set background=dark
 set guioptions-=T
 set mousemodel=popup
 set hlsearch
 set autoindent
-set tags=~/.vim/tags
-filetype on
+set tags=~/.vim/tags/default
 let python_highlight_all = 1
+filetype on
+syntax on
+
+" Enable module loader
+call pathogen#infect()
+" Fuzzy Finder file ignores
+set wildignore+=*.pyc,*.so,*.swp,
 
 " Make shift-insert work like in Xterm
 map <S-Insert> <MiddleMouse>
