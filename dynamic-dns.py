@@ -2,7 +2,9 @@
 
 # Run every 10 mins in crontab
 
+from urllib2 import Request, urlopen, URLError, HTTPError
 from subprocess import check_output, call
+from urllib import urlencode
 import argparse
 import sys
 import re
@@ -35,6 +37,17 @@ def save(address):
     with open("%s/.dynip-address" % os.environ['HOME'], 'w') as file:
         return file.write(address)
 
+def request(url, **kwargs):
+    req = Request(url, urlencode(kwargs))
+    req.get_method = lambda *args, **kwargs: 'GET'
+
+    try:
+        if urlopen(req).getcode() == 200:
+            return True
+        return False
+    except (HTTPError, URLError), e:
+        print str(e)
+    return False
 
 def run(interface, key):
     if not interface:
@@ -44,7 +57,7 @@ def run(interface, key):
         url = "http://freedns.afraid.org/dynamic/update.php?%s&address=%s" % (key, address)
         print "IP Address Changed: ", address
         print "Update URL: ", url
-        call(['curl', '-s', url])
+        request(url)
         save(address)
         return 0
     return 1
