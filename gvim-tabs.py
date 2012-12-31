@@ -1,16 +1,31 @@
 #! /usr/bin/python
 
+import platform
 import sys
 import re
 import os
 
-def buildNewArgs( new_argv ):
+
+gvim_path = '/usr/bin/gvim'
+
+def linux_buildNewArgs( new_argv ):
     if len(new_argv):
-        arg = [ '/usr/bin/gvim', '--servername', 'GVIMLOCAL', '--remote-tab-silent' ]
+        arg = [ gvim_path, '--servername', 'GVIMLOCAL', '--remote-tab-silent' ]
         arg.extend( new_argv )
         return arg
+    return [ gvim_path, '--servername', 'GVIMLOCAL' ]
 
-    return [ '/usr/bin/gvim', '--servername', 'GVIMLOCAL' ]
+def osx_buildNewArgs( new_argv ):
+    if len(new_argv):
+        arg = [ gvim_path, '-g', '--servername', 'GVIMLOCAL', '--remote-tab-silent' ]
+        arg.extend( new_argv )
+        return arg
+    return [ gvim_path, '-g', '--servername', 'GVIMLOCAL' ]
+
+buildNewArgs = linux_buildNewArgs
+if platform.system() == "Darwin":
+    gvim_path = '/Applications/MacVim.app/Contents/MacOS/Vim'
+    buildNewArgs = osx_buildNewArgs
 
 def removeHomeDir( value ):
     home_dir = os.path.expanduser("~")
@@ -54,12 +69,9 @@ def replaceFilePaths( argv, searchPath ):
 
 if __name__ == '__main__':
     #home_source = os.path.join( os.path.expanduser("~"), "core.rackspace.com" )
-    #searchPath = [ home_source, "/home/core/core.rackspace.com", "/home/core",
-                   #"/home/thrawn/dev/vm-root" ]
-
+    #searchPath = [home_source, "/home/core/core.rackspace.com", "/home/core",]
     #args = buildNewArgs( replaceFilePaths( sys.argv[1:], searchPath ) )
+
     args = buildNewArgs( sys.argv[1:] )
-    print "/usr/bin/gvim", args
-    os.execvpe( "/usr/bin/gvim", args, dict(os.environ) )
-
-
+    os.execvpe( gvim_path, args, dict(os.environ) )
+    #print gvim_path, args
