@@ -33,6 +33,10 @@ let python_highlight_all = 1
 filetype on
 syntax on
 
+set showmatch " Show matching braces when cursor is over a brace
+filetype indent on " Change indent when viewing .scala
+set si " Smart Indent
+
 " Enable module loader
 call pathogen#infect()
 " Fuzzy Finder file ignores
