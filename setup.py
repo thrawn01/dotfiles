@@ -141,3 +141,5 @@ export PS1="$C3$C4..( $C2\u$C1@$C3\h$C1 ($C2\$(current_branch)$C1): $C2\w$C1$C1 
 
     print " -- Modify This line in /etc/sudoers"
     print "%sudo	ALL=(ALL:ALL) NOPASSWD: ALL"
+    print " -- run this to link the git commands"
+    print "sudo cd `git --exec-path`; ln -s ~/bin/git-* ."
