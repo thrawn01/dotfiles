@@ -129,6 +129,14 @@ C3="\[\e[1;32m\]" # <- hostname color
 C4="\[\e[1;34m\]" # <- seperator color (..[ ]..)
 PROMPT='>'
 export PS1="$C3$C4..( $C2\u$C1@$C3\h$C1 ($C2\$(current_branch)$C1): $C2\w$C1$C1 : $C2\t$C1 $C4)..\n$C3$C2$PROMPT$C1$PROMPT$C0 "
+
+### OSX only ###
+# brew install coreutils && brew install git && brew doctor
+# Fix the paths by modifying /etc/paths
+# Now uncomment the following
+
+# eval `gdircolors`
+# alias ls='gls --color=auto'
 """
 
     print " -- Modify This line in /etc/sudoers"
