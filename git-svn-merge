@@ -32,9 +32,9 @@ def run(cmd, explain):
 
 
 def apply_patches(dir, explain):
+    cmd = "git am %s" % dir
     if explain:
         return sys.stdout.write("-- %s\n" % cmd)
-    cmd = "git am %s" % dir
     if call(cmd, shell=True):
         print "Fix the merge files then re-run '%s' cmd"
         sys.exit(1)
