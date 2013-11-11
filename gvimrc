@@ -1,1 +1,1 @@
- colorscheme thrawn
+colorscheme thrawn
