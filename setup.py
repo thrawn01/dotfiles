@@ -62,8 +62,8 @@ def search(file, needle):
         return False
 
 
-def edit(target, source):
-    # If the target file already has the edits
+def append(target, source):
+    # If the target file already has the appends
     if search(target, '# dev-tools'):
         return
 
@@ -71,6 +71,27 @@ def edit(target, source):
         with open(target, "a") as dest:
             for line in src:
                 dest.write(line)
+
+def edit(file, regex, replace):
+    output = []
+    found = False
+    replace = "%s\n" % replace
+
+    # Open the file and search for the regex
+    with open(file, 'r') as src:
+        for line in src:
+            if re.search(regex, line):
+                output.append(replace)
+                found = True
+            else:
+                output.append(line)
+
+    # If the regex was found in the file, write out the new file
+    if found:
+        with open(file, 'w') as src:
+            src.truncate()
+            for line in output:
+                src.write(line)
 
 
 if __name__ == "__main__":
@@ -130,15 +151,27 @@ if __name__ == "__main__":
     call('git config --global user.name "Derrick J. Wippler"', shell=True)
     call('git config --global user.email thrawn01@gmail.com', shell=True)
 
+    bashrc = os.path.join(home_dir, ".bashrc")
     # Setup .bashrc
     if path.exists("/Library"):
+        bashrc = os.path.join(home_dir, ".bash_profile")
         # OSX
-        edit(os.path.join(home_dir, ".bash_profile"), "osx/bash_profile")
+        append(bashrc, "osx/bash_profile")
         call('cd `git --exec-path`; sudo ln -s %s/bin/git-* ."' % home_dir)
     else:
         # Linux
-        edit(os.path.join(home_dir, ".bashrc"), "bashrc")
+        append(bashrc, "bashrc")
 
     print "\n\n"
+    print "Choose a color for the bash prompt hostname"
+    print " 1 = Red, 2 = Green, 3 = Yellow, 4 = Blue "
+    print " 5 = Pink, 6 = Cyan, 7 = White, 8 = Black "
+    color = getUserInput("Color (default=4) > ", '4', '^\d$')
+    edit(bashrc, "^C3=", "C3=\"\[\e[1;3%sm\]\" # <- hostname color" % color)
+
+    print "Choose a name to report in iterm tabs"
+    tab = getUserInput("Tab (default=\h) > ", '\h')
+    edit(bashrc, "^TAB=", "TAB='\\033]0;%s\\007'" % tab)
+
     print " -- Modify This line in /etc/sudoers"
     print "%sudo	ALL=(ALL:ALL) NOPASSWD: ALL"
