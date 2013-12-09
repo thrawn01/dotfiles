@@ -51,6 +51,28 @@ def skipable(file, skip_regex):
     return False
 
 
+def search(file, needle):
+    try:
+        with open(file, 'r') as haystack:
+            for line in haystack:
+                if re.search(needle, line):
+                    return True
+        return False
+    except IOError, e:
+        return False
+
+
+def edit(target, source):
+    # If the target file already has the edits
+    if search(target, '# dev-tools'):
+        return
+
+    with open(source, 'r') as src:
+        with open(target, "a") as dest:
+            for line in src:
+                dest.write(line)
+
+
 if __name__ == "__main__":
 
     # Get my name
@@ -81,7 +103,7 @@ if __name__ == "__main__":
 
         # Skip the setup.py program
         if skipable(file, ['dev-utils.py', prog_name, '.swp', '^\.',
-                '\.vim', 'rc$', 'README']):
+                '\.vim', '.cnf$', 'mysql-user', 'rc$', 'README']):
             continue
 
         # Some file need to be linked as different names
@@ -108,40 +130,15 @@ if __name__ == "__main__":
     call('git config --global user.name "Derrick J. Wippler"', shell=True)
     call('git config --global user.email thrawn01@gmail.com', shell=True)
 
-    print """
-# Add this to .bashrc or .bash_profile
-export PATH="$PATH:~/bin"
-alias gvim='~/bin/gvim-tabs.py'
+    # Setup .bashrc
+    if path.exists("/Library"):
+        # OSX
+        edit(os.path.join(home_dir, ".bash_profile"), "osx/bash_profile")
+        call('cd `git --exec-path`; sudo ln -s %s/bin/git-* ."' % home_dir)
+    else:
+        # Linux
+        edit(os.path.join(home_dir, ".bashrc"), "bashrc")
 
-# OSX X11 Timeout Issue
-#ForwardX11Timeout 596h
-alias ssh='ssh -X'
-
-function current_branch() {
-    git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\\1/'
-}
-
-# Leet Promptness
-C0="\[\e[0m\]"
-C1="\[\e[1;30m\]" # <- subdued color
-C2="\[\e[1;37m\]" # <- regular color
-C3="\[\e[1;32m\]" # <- hostname color
-C4="\[\e[1;34m\]" # <- seperator color (..[ ]..)
-TAB='\\033]0;\h\\007'
-PROMPT='>'
-export PS1="$TAB$C3$C4..( $C2\u$C1@$C3\h$C1 ($C2\$(current_branch)$C1): $C2\w$C1$C1 : $C2   $C1 $C4)..
-$C3$C2$PROMPT$C1$PROMPT$C0 "
-
-### OSX only ###
-# brew install coreutils && brew install git && brew doctor
-# Fix the paths by modifying /etc/paths
-# Now uncomment the following
-
-# eval `gdircolors`
-# alias ls='gls --color=auto'
-"""
-
+    print "\n\n"
     print " -- Modify This line in /etc/sudoers"
     print "%sudo	ALL=(ALL:ALL) NOPASSWD: ALL"
-    print " -- run this to link the git commands"
-    print "sudo cd `git --exec-path`; ln -s ~/bin/git-* ."

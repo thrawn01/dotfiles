@@ -1,0 +1,14 @@
+# ---------------------
+# dev-tools/osx/bash_profile
+# ---------------------
+
+# OSX X11 Timeout Issue
+ForwardX11Timeout 596h
+alias ssh='ssh -X'
+
+### OSX only ###
+# brew install coreutils && brew install git && brew doctor
+# Fix the paths by modifying /etc/paths
+
+eval `gdircolors`
+alias ls='gls --color=auto'
