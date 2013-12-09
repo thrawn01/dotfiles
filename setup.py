@@ -127,8 +127,10 @@ C1="\[\e[1;30m\]" # <- subdued color
 C2="\[\e[1;37m\]" # <- regular color
 C3="\[\e[1;32m\]" # <- hostname color
 C4="\[\e[1;34m\]" # <- seperator color (..[ ]..)
+TAB='\\033]0;\h\\007'
 PROMPT='>'
-export PS1="$C3$C4..( $C2\u$C1@$C3\h$C1 ($C2\$(current_branch)$C1): $C2\w$C1$C1 : $C2\t$C1 $C4)..\n$C3$C2$PROMPT$C1$PROMPT$C0 "
+export PS1="$TAB$C3$C4..( $C2\u$C1@$C3\h$C1 ($C2\$(current_branch)$C1): $C2\w$C1$C1 : $C2   $C1 $C4)..
+$C3$C2$PROMPT$C1$PROMPT$C0 "
 
 ### OSX only ###
 # brew install coreutils && brew install git && brew doctor
