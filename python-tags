@@ -1,3 +1,3 @@
 #! /bin/sh
 
-ctags --python-kinds=-i -R -o ~/.vim/tags/some-python-project /home/thrawn/dev/some-python-project
+ctags --python-kinds=-i -R -o $PWD/tags $PWD
