@@ -1,3 +1,4 @@
 Host *
+    ForwardX11Timeout 596h
     ForwardAgent yes
     ServerAliveInterval 30
