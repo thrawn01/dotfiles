@@ -18,12 +18,11 @@ def getUserInput(msg, default=None, validate=None):
                 return default
 
         # Did we ask to validate the input
-        if validate:
-            if re.search(validate, input):
-                return input
-            print "Invalid entry, Try again"
-        else:
+        if not validate:
             return input
+        if re.search(validate, input):
+            return input
+        print "Invalid entry, Try again"
 
 
 def YesNo(msg, default=None):
