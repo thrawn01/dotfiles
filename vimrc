@@ -1,24 +1,10 @@
-" An example for a gvimrc file.
-" The commands in this are executed when the GUI is started.
-"
-" Maintainer:	Bram Moolenaar <Bram@vim.org>
-" Last change:	2001 Sep 02
-"
-" To use it, copy it to
-"     for Unix and OS/2:  ~/.gvimrc
-"	      for Amiga:  s:.gvimrc
-"  for MS-DOS and Win32:  $VIM\_gvimrc
-"	    for OpenVMS:  sys$login:.gvimrc
+" ======================================================
+" Maintainer:	Derrick J Wippler <thrawn01@gmail.com>
+" ======================================================
 
-" Make external commands work through a pipe instead of a pseudo-tty
-"set noguipty
-
-" set the X11 font to use
-" set guifont=-misc-fixed-medium-r-normal--14-130-75-75-c-70-iso8859-1
-
-set ch=2		" Make command line two lines high
+set ch=2		    " Make command line two lines high
 set mousehide		" Hide the mouse when typing text
-set dir=~/.vimswap
+set dir=~/.vimswap  " Don't litter the filesystem with swapfiles
 set expandtab
 set shiftwidth=4
 set tabstop=4
@@ -28,24 +14,25 @@ set guioptions-=T
 set mousemodel=popup
 set hlsearch
 set autoindent
-set tags=~/.vim/tags/default
+set tags=./tags;/ " Loads any files named 'tags' in the directory tree
+set nocompatible
+set ruler
+set backspace=indent,eol,start
 let python_highlight_all = 1
-filetype on
 syntax on
 
-set showmatch " Show matching braces when cursor is over a brace
-filetype indent on " Change indent when viewing .scala
-set si " Smart Indent
+" Show matching braces when cursor is over a brace
+set showmatch
 
-" Enable module loader
-call pathogen#infect()
-" Fuzzy Finder file ignores
-set wildignore+=*.pyc,*.so,*.swp,
+" Smart Indent
+set si
+
 
 " Make shift-insert work like in Xterm
 map <S-Insert> <MiddleMouse>
 map! <S-Insert> <MiddleMouse>
 
+" My personal Keybindings for Navigating Tabs
 nmap <C-S-h> :tabprevious<cr>
 nmap <C-S-l> :tabnext<cr>
 map <C-S-h> :tabprevious<cr>
@@ -55,6 +42,7 @@ imap <C-S-l> <ESC>:tabnext<cr>i
 nmap <C-S-N> :tabnew<cr>
 imap <C-t> <ESC>:tabnew<cr>
 
+" Put the basename on the GUI Tabs instead of the full path
 function GuiTabLabel()
 	  let label = ''
 	  let bufnrlist = tabpagebuflist(v:lnum)
@@ -82,4 +70,40 @@ endfunction
 
 "set guitablabel=%{GuiTabLabel()}
 set guitablabel=%t
+
+" Required for vundle
+filetype off 
+filetype plugin indent on
+
+" Fuzzy Finder file ignores
+set wildignore+=*.pyc,*.so,*.swp,
+
+" Required for vim-python-pep8-indent
+let g:pymode_indent = 0 
+
+" Vundle
+set rtp+=~/.vim/bundle/vundle/
+call vundle#rc()
+
+" Vundle Managed Vim Plugins ( :BundleInstall to install the Managed Bundles )
+Bundle 'gmarik/vundle'
+
+" Completion with CTRL-J
+Bundle 'Valloric/YouCompleteMe'
+" GIT plugin :Gdiff
+Bundle 'tpope/vim-fugitive'
+" Start TagBar with F8
+Bundle 'majutsushi/tagbar'
+" Pep8 Check with F7
+Bundle 'nvie/vim-flake8'
+" Search for files with CTRL-P
+Bundle 'kien/ctrlp.vim'
+" Fixes indent to be pep8 compatable
+Bundle 'hynek/vim-python-pep8-indent'
+" Opens when VIM gets a directory to open
+Bundle 'scrooloose/nerdtree'
+
+nmap <F8> :TagbarToggle<CR>
+nmap <C-j> :YcmCompleter GoToDefinition<CR>
+nmap <C-p> :CtrlP<CR>
 
