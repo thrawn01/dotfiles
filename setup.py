@@ -98,6 +98,14 @@ if __name__ == "__main__":
     # Get my name
     prog_name = sys.argv[0].lstrip("./")
 
+    # Ensure we don't get run on shared user accounts!
+    user = os.environ.get('USER', '')
+    if user != 'thrawn':
+        question = "\n-- Current user '%s' != 'thrawn' Continue (Y/N) ? " % user
+        if not YesNo(question, "Y"):
+            sys.exit(-1)
+
+
     # Default install directory to ~/bin
     home_dir = os.environ.get('HOME', '')
     if home_dir == '':
