@@ -1,0 +1,11 @@
+#!/bin/bash
+
+DB=cinder_prod
+
+echo "delete from volume_metadata;" | mysql -D $DB
+echo "delete from volume_admin_metadata;" | mysql -D $DB
+echo "delete from volume_glance_metadata;" | mysql -D $DB
+echo "delete from snapshots;" | mysql -D $DB
+echo "delete from volumes;" | mysql -D $DB
+echo "delete from backups;" | mysql -D $DB
+echo "update quota_usages set in_use=0;" | mysql -D $DB
