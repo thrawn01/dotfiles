@@ -1,9 +1,9 @@
 " ======================================================
-" Maintainer:	Derrick J Wippler <thrawn01@gmail.com>
+" Maintainer:  Derrick J Wippler <thrawn01@gmail.com>
 " ======================================================
 
-set ch=2		    " Make command line two lines high
-set mousehide		" Hide the mouse when typing text
+set ch=2            " Make command line two lines high
+set mousehide       " Hide the mouse when typing text
 set dir=~/.vimswap  " Don't litter the filesystem with swapfiles
 set expandtab
 set shiftwidth=4
@@ -54,32 +54,35 @@ imap <C-t> <ESC>:tabnew<cr>
 
 " Put the basename on the GUI Tabs instead of the full path
 function GuiTabLabel()
-	  let label = ''
-	  let bufnrlist = tabpagebuflist(v:lnum)
+      let label = ''
+      let bufnrlist = tabpagebuflist(v:lnum)
 
-	  " Add '+' if one of the buffers in the tab page is modified
-	  for bufnr in bufnrlist
-	    if getbufvar(bufnr, "&modified")
-	      let label = '+'
-	      break
-	    endif
-	  endfor
+      " Add '+' if one of the buffers in the tab page is modified
+      for bufnr in bufnrlist
+        if getbufvar(bufnr, "&modified")
+          let label = '+'
+          break
+        endif
+      endfor
 
-	  " Append the number of windows in the tab page if more than one
-	  let wincount = tabpagewinnr(v:lnum, '$')
-	  if wincount > 1
-	    let label .= wincount
-	  endif
-	  if label != ''
-	    let label .= ' '
-	  endif
+      " Append the number of windows in the tab page if more than one
+      let wincount = tabpagewinnr(v:lnum, '$')
+      if wincount > 1
+        let label .= wincount
+      endif
+      if label != ''
+        let label .= ' '
+      endif
 
-	  " Append the buffer name
-	  return label . simplify(bufname(bufnrlist[tabpagewinnr(v:lnum) - 1]))
+      " Append the buffer name
+      return label . simplify(bufname(bufnrlist[tabpagewinnr(v:lnum) - 1]))
 endfunction
 
 "set guitablabel=%{GuiTabLabel()}
 set guitablabel=%t
+
+" Include go syntax highlighting
+set rtp+=$GOROOT/misc/vim
 
 " Required for vundle
 filetype off 
@@ -112,8 +115,33 @@ Bundle 'kien/ctrlp.vim'
 Bundle 'hynek/vim-python-pep8-indent'
 " Opens when VIM gets a directory to open
 Bundle 'scrooloose/nerdtree'
+" Fancy Status Line
+Plugin 'bling/vim-airline'
+" Go Language Plugins
+Plugin 'fatih/vim-go'
 
 nmap <F8> :TagbarToggle<CR>
-nmap <C-j> :YcmCompleter GoToDefinition<CR>
+"nmap <C-j> :YcmCompleter GoToDefinition<CR>
+nmap <C-j> :YcmCompleter GoToDefinitionElseDeclaration<CR>
 nmap <C-p> :CtrlP<CR>
 
+" Mark line longer than 79 characters in RED
+highlight ColorColumn ctermbg=red
+au BufWinEnter *.py let w:m1=matchadd('ColorColumn', '\%81v', 100)
+
+" Make TABS and trailling spaces visible
+"set listchars=tab:>~,nbsp:_,trail:.
+set listchars=tab:>-,nbsp:_,trail:.
+set list
+set laststatus=2
+
+" Enable Syntax highlighting
+let g:go_highlight_functions = 1
+let g:go_highlight_methods = 1
+let g:go_highlight_structs = 1
+
+au FileType *.go set tabstop=4 shiftwidth=4 noexpandtab nolist
+au BufEnter *.go set ai sw=4 ts=4 noet nolist
+
+au FileType *.sls set autoindent tabstop=2 shiftwidth=2 expandtab list
+au BufEnter *.sls set ai sw=2 ts=2 et list
