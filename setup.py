@@ -164,7 +164,11 @@ if __name__ == "__main__":
         bashrc = os.path.join(home_dir, ".bash_profile")
         # OSX
         append(bashrc, "osx/bash_profile")
-        call('cd `git --exec-path`; sudo ln -s %s/bin/git-* ."' % home_dir)
+        os.system('cd `git --exec-path`; sudo ln -s %s/bin/git-* ."' % home_dir)
+        print "--- OSX only ---"
+        print "-- brew install coreutils && brew install git && brew doctor"
+        print "-- Fix the paths by modifying /etc/paths"
+
     else:
         # Linux
         append(bashrc, "bashrc")
