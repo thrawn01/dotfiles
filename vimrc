@@ -52,6 +52,20 @@ imap <C-S-l> <ESC>:tabnext<cr>i
 nmap <C-S-N> :tabnew<cr>
 imap <C-t> <ESC>:tabnew<cr>
 
+" Support virtualenv if it exists
+if has('python')
+py << EOF
+import os.path
+import sys
+import vim
+if 'VIRTUAL_ENV' in os.environ:
+    project_base_dir = os.environ['VIRTUAL_ENV']
+    sys.path.insert(0, project_base_dir)
+    activate_this = os.path.join(project_base_dir, 'bin/activate_this.py')
+    execfile(activate_this, dict(__file__=activate_this))
+EOF
+endif
+
 " Put the basename on the GUI Tabs instead of the full path
 function GuiTabLabel()
       let label = ''
@@ -95,11 +109,11 @@ set wildignore+=*.pyc,*.so,*.swp,
 let g:pymode_indent = 0 
 
 " Vundle
-set rtp+=~/.vim/bundle/vundle/
+set rtp+=~/.vim/bundle/Vundle.vim/
 call vundle#rc()
 
-" Vundle Managed Vim Plugins ( :BundleInstall to install the Managed Bundles )
-Bundle 'gmarik/vundle'
+" Vundle Managed Vim Plugins ( :PluginInstall to install the Managed Bundles )
+Bundle 'gmarik/Vundle.vim'
 
 " Completion with CTRL-J
 Bundle 'Valloric/YouCompleteMe'
@@ -119,6 +133,12 @@ Bundle 'scrooloose/nerdtree'
 Plugin 'bling/vim-airline'
 " Go Language Plugins
 Plugin 'fatih/vim-go'
+" GeekNote Plugin
+Bundle 'https://github.com/neilagabriel/vim-geeknote'
+
+" GeekNote Plugin Settings
+noremap <F9> :Geeknote<CR>
+let g:GeeknoteFormat="markdown"
 
 nmap <F8> :TagbarToggle<CR>
 "nmap <C-j> :YcmCompleter GoToDefinition<CR>
