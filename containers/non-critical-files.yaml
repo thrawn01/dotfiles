@@ -1,0 +1,33 @@
+delete:
+  - \.go$
+  - \.cpp$
+  - \.c$
+  - \.cxx$
+  - \.h$
+  - \.hpp$
+  - \.info$
+  - \.m4$
+  - \.mk$
+  - \.mk$
+  - ^.*pod.*\.pod$
+  - ^.*ruby.*/ri/.*$
+  - COPYING
+  - README
+  - Makefile
+  - configure\.*$
+  - configure$
+  - /build-aux/
+  - /info/
+  - /doc/
+  - /docs/
+  - /include/
+  - /man/
+  - /locale/
+  - /share/i18n/
+  - /pkgconfig/
+  - /terminfo/
+
+exclude:
+  - ^.*terminfo/s/screen.*$
+  - ^.*terminfo/x/xterm.*$
+  - ^.*terminfo/l/linux.*$
