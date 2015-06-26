@@ -29,20 +29,29 @@ class RegexMatcher(object):
         self.deletes = self.compile(config.get('delete', []))
         self.excludes = self.compile(config.get('exclude', []))
 
-    def match(self, path):
-        def _match(regexes):
-            for regex in regexes:
-                if regex.search(path):
-                    return regex.pattern
-            return None
+    def _match(self, regexes, path):
+        for regex in regexes:
+            if regex.search(path):
+                return regex.pattern
+        return None
 
+    def sanitize(self, path):
+        # Remove '.' if it exists
+        return re.sub('^\.', '', path)
+
+    def match(self, path):
+        path = self.sanitize(path)
         # If the path matches any delete reqexes
-        matched = _match(self.deletes)
+        matched = self._match(self.deletes, path)
         if matched:
             # and if the match is not in the excludes
-            if not _match(self.excludes):
+            if not self._match(self.excludes, path):
                 print("-- Matched '%s' - '%s'" % (matched, path))
                 return True
+
+    def match_excludes(self, path):
+        path = self.sanitize(path)
+        return self._match(self.excludes, path)
 
     def compile(self, regexes):
         return [re.compile(regex) for regex in regexes]
@@ -53,13 +62,15 @@ class Application(object):
     def isEmpty(self, dirName):
         return (len(os.listdir(dirName)) == 0)
 
-    def deleteDirs(self, path, opts):
+    def deleteDirs(self, matcher, path, opts):
         if self.isEmpty(path) and opts.del_dirs:
+            if matcher.match_excludes(path):
+                return None
             print("-- Deleting empty Directory %s" % (path))
             if opts.force:
                 shutil.rmtree(path)
             # Climb up the dir tree, is it empty also?
-            return self.deleteDirs(os.path.dirname(path), opts)
+            return self.deleteDirs(matcher, os.path.dirname(path), opts)
 
     def delete(self, path, matcher, opts):
         for dirName, dirNames, fileNames in os.walk(path):
@@ -81,7 +92,7 @@ class Application(object):
                     os.unlink(path)
 
             if opts.del_dirs:
-                self.deleteDirs(dirName, opts)
+                self.deleteDirs(matcher, dirName, opts)
 
     def run(self, args):
         description = """
