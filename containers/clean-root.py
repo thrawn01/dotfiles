@@ -1,7 +1,6 @@
 #! /usr/bin/env python
 
 from __future__ import print_function
-
 from argparse import ArgumentParser
 import shutil
 import yaml
@@ -99,6 +98,11 @@ class Application(object):
             Delete files from a directory tree by reading a list of file
             regexes from a yaml config file
 
+            *****************************************************************
+            NOTE: Script by default prints the files it will delete, you must
+            use --force for the script to actually delete the files
+            *****************************************************************
+
             Example config file to delete all *.go and *.bat files, excluding
             files inside /docs directory.
 
@@ -113,11 +117,12 @@ class Application(object):
         p.add_argument('--path', '-p', default='.', help="Delete files"
                        " specified in this path tree (default: current"
                        " directory)")
-        p.add_argument('--del-dirs', '-d', default=False, action='store_true',
+        p.add_argument('--del-dirs', '-d', action='store_true',
                        help="Delete directories if they are empty")
-        p.add_argument('--force', '-f', default=False, action='store_true',
-                       help="Delete files")
-        p.add_argument('config', metavar='<CONFIG-FILE>', help="YAML config file")
+        p.add_argument('--force', '-f', action='store_true',
+                       help="Not a dry-run; preform the actual deletions")
+        p.add_argument('config', metavar='<CONFIG-FILE>',
+                       help="YAML config file")
         opts = p.parse_args(args)
 
         with open(opts.config) as fd:
@@ -130,9 +135,9 @@ class Application(object):
 
 
 if __name__ == "__main__":
-        #try:
-            app = Application()
-            sys.exit(app.run(sys.argv[1:]))
-        #except (Exception), e:
-            #print("-- non-zero exit: %s" % e)
-            #sys.exit(1)
+    try:
+        app = Application()
+        sys.exit(app.run(sys.argv[1:]))
+    except (Exception), e:
+        print("-- non-zero exit: %s" % e)
+        sys.exit(1)

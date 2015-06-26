@@ -1,0 +1,8 @@
+keep-pkgs:
+    #- weechat
+  - openssh-server
+  - dpkg
+  - apt
+  - python-yaml
+  - python
+    # - libpam-runtime

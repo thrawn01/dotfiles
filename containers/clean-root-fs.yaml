@@ -26,8 +26,15 @@ delete:
   - /share/i18n/
   - /pkgconfig/
   - /terminfo/
+  - /var/lib/apt/lists
 
 exclude:
   - ^.*terminfo/s/screen.*$
   - ^.*terminfo/x/xterm.*$
   - ^.*terminfo/l/linux.*$
+  - ^/vagrant.*$
+  - ^/dev.*$
+  - ^/sys.*$
+  - ^/proc.*$
+  - ^/var.*$
+  - ^/root.*$
