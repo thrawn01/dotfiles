@@ -1,0 +1,129 @@
+#! /usr/bin/env python
+
+from __future__ import print_function
+
+from optparse import IndentedHelpFormatter, OptionParser
+from subprocess import check_output, call
+
+import pickle
+import errno
+import sys
+import os
+
+
+def load(fileName):
+    try:
+        fileName = os.path.expanduser(fileName)
+        with open(fileName, 'r') as fd:
+            return pickle.load(fd)
+    except IOError, e:
+        # No such file/dir
+        if e.errno == errno.ENOENT:
+            return {}
+        raise
+
+
+def save(fileName, commitMsgs):
+    fileName = os.path.expanduser(fileName)
+    with open(fileName, 'w') as fd:
+        pickle.dump(commitMsgs, fd)
+
+
+def run(cmd, explain):
+    if explain:
+        return sys.stdout.write("-- %s\n" % cmd)
+    if call(cmd, shell=True):
+        print("Command '%s' returned non-zero exit status" % cmd)
+        sys.exit(1)
+
+
+def removeOldCommitMsgs(msgs, opts):
+    branches = check_output("git for-each-ref --format='%(refname:short)'"
+                            " refs/heads/", shell=True).rstrip()
+    return { branch:msgs[branch] for branch in branches.split('\n')
+            if branch in msgs }
+
+def getCommitMsg(fileName, branch, opts):
+    commitMsgs = load(fileName)
+    print(commitMsgs)
+    if not opts.message:
+        if branch in commitMsgs:
+            return commitMsgs[branch]
+        return None
+    # Add the commit message to the hash
+    commitMsgs[branch] = opts.message
+    # Save the new commit message, and clean up old ones
+    save(fileName, removeOldCommitMsgs(commitMsgs, opts))
+    # Return the provided message
+    return opts.message
+
+
+class SafeList(list):
+    def __getitem__(self, key):
+        try:
+            return list.__getitem__(self, key)
+        except IndexError:
+            return None
+
+class DescFormatter(IndentedHelpFormatter):
+
+    def format_description(self, description):
+        return "Assist in creating Squashed Pull Requests\n"\
+               "\n"\
+               "Example:\n"\
+               "     git checkout my-branch\n"\
+               "     git squash\n"\
+               "\n"\
+               "Or you can specify the remote\n"\
+               "     git squash github\n"\
+               "     git squash origin\n"
+
+
+if __name__ == '__main__':
+    parser = OptionParser(usage="Usage: %prog [-h]",
+                formatter=DescFormatter(), description=' ')
+    parser.add_option('-e', '--explain', const=True, action='store_const',
+            help="print commands to be executed, instead of executing them")
+    parser.add_option('-m', '--message',
+            help="The commit message used when squashing the commits")
+
+    opts, args = parser.parse_args()
+    args = SafeList(args)
+
+    # If the user specifed a remote repo
+    remote = args[0] or 'origin'
+
+    # Get the current branch from git
+    branch = check_output("git name-rev --name-only HEAD", shell=True).rstrip()
+    if branch == '':
+        print("-- Could not determine local branch name; not in a git repo?")
+        sys.exit(1)
+
+    # No need to squash master
+    if branch == 'master':
+        print("-- Refusing to squash 'master'")
+        sys.exit(0)
+
+    pullRequestBranch = "%s_SQUASH" % branch
+    commitMsg = getCommitMsg('~/.git-squashrc', branch, opts)
+
+    # If not commit message was found
+    if not commitMsg:
+        print("No Previous Commit Message found, You must provide one with -m")
+        sys.exit(-1);
+
+    # Checkout master
+    run("git checkout master" % locals(), opts.explain)
+    # Create a new branch
+    run("git checkout -b %(pullRequestBranch)s" % locals(), opts.explain)
+    # Merge and squash the commits from the original branch
+    run("git merge --squash %(branch)s" % locals(), opts.explain)
+    # Commit the merge
+    run("git commit -m \"%(commitMsg)s\"" % locals(), opts.explain)
+    # Create the new branch on the remote --force to update any PR that already exists
+    run("git push --force %(remote)s %(pullRequestBranch)s:refs/heads/%(branch)s"
+            % locals(), opts.explain)
+    # Return to the original branch
+    run("git checkout %(branch)s" % locals(), opts.explain)
+    # Delete the Pull Request branch
+    run("git branch -D %(pullRequestBranch)s" % locals(), opts.explain)
