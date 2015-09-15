@@ -71,8 +71,8 @@ class Application(object):
             # Climb up the dir tree, is it empty also?
             return self.deleteDirs(matcher, os.path.dirname(path), opts)
 
-    def delete(self, path, matcher, opts):
-        for dirName, dirNames, fileNames in os.walk(path):
+    def delete(self, root, matcher, opts):
+        for dirName, dirNames, fileNames in os.walk(root):
             for name in dirNames:
                 path = os.path.join(dirName, name)
                 if not matcher.match(path):
@@ -114,9 +114,8 @@ class Application(object):
                 - /docs
         """
         p = ArgumentParser(description=description)
-        p.add_argument('--path', '-p', default='.', help="Delete files"
-                       " specified in this path tree (default: current"
-                       " directory)")
+        p.add_argument('--root', '-r', default='/', help="Delete files"
+                       " from the specified root directory (default is '/')")
         p.add_argument('--del-dirs', '-d', action='store_true',
                        help="Delete directories if they are empty")
         p.add_argument('--force', '-f', action='store_true',
@@ -131,7 +130,7 @@ class Application(object):
 
         # Load the regex expression from the config
         matcher = RegexMatcher(config)
-        self.delete(opts.path, matcher, opts)
+        self.delete(opts.root, matcher, opts)
 
 
 if __name__ == "__main__":

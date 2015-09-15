@@ -36,6 +36,9 @@ class Application(object):
         p = ArgumentParser(description=description)
         p.add_argument('--debug', '-d', action='store_true',
                        help="Print debug stuff to stdout")
+        p.add_argument('--root', '-r', action='store_true', default='/',
+                       help="Delete from the specified root"
+                       " directory (default is '/')")
         p.add_argument('--force', '-f', action='store_true',
                        help="not a dry-run preform the actual removals")
         p.add_argument('config', metavar='<CONFIG-FILE>',

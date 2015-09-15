@@ -22,5 +22,19 @@ PROMPT='>'
 export PS1="$TAB$C3$C4..( $C2\u$C1@$C3\h$C1 ($C2\$(current_branch)$C1): $C2\w$C1$C1 : $C2   $C1 $C4)..
 $C3$C2$PROMPT$C1$PROMPT$C0 "
 
-export VIRTUAL_ENV_DISABLE_PROMPT=1
-source ~/.virtualenv/bin/activate 2> /dev/null
+export PATH=/usr/local/bin:/usr/local/sbin:$PATH
+
+#export VIRTUAL_ENV_DISABLE_PROMPT=1
+#source ~/.virtualenv/bin/activate 2> /dev/null
+
+# NVM Stuff
+export NVM_DIR="/Users/thrawn/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
+
+# GoLang Stuff
+export GOPATH=$HOME/Development/go
+export PATH=/Users/thrawn/bin:$GOPATH/bin:$PATH
+
+# RVM Stuff
+export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
+[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
