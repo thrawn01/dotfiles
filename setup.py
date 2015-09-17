@@ -157,6 +157,7 @@ if __name__ == "__main__":
     call('git config --global color.branch auto', shell=True)
     call('git config --global user.name "Derrick J. Wippler"', shell=True)
     call('git config --global user.email thrawn01@gmail.com', shell=True)
+    call('git config --global push.default current', shell=True)
 
     bashrc = os.path.join(home_dir, ".bashrc")
     # Setup .bashrc
