@@ -2,7 +2,7 @@
 " Maintainer:  Derrick J Wippler <thrawn01@gmail.com>
 " ======================================================
 
-set ch=2            " Make command line two lines high
+set ch=1            " Make command line two lines high
 set mousehide       " Hide the mouse when typing text
 set dir=~/.vimswap  " Don't litter the filesystem with swapfiles
 set expandtab
