@@ -120,10 +120,8 @@ if __name__ == '__main__':
     run("git merge --squash %(branch)s" % locals(), opts.explain)
     # Commit the merge
     run("git commit -m \"%(commitMsg)s\"" % locals(), opts.explain)
-    # Create the new branch on the remote --force to update any PR that already exists
-    run("git push --force %(remote)s %(pullRequestBranch)s:refs/heads/%(branch)s"
+    # Create/Push the branch on the remote --force to update any PR that already exists
+    run("git push --force %(remote)s %(pullRequestBranch)s:refs/heads/%(pullRequestBranch)s"
             % locals(), opts.explain)
     # Return to the original branch
     run("git checkout %(branch)s" % locals(), opts.explain)
-    # Delete the Pull Request branch
-    run("git branch -D %(pullRequestBranch)s" % locals(), opts.explain)

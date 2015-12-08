@@ -1,0 +1,161 @@
+#! /usr/bin/env python
+
+from __future__ import print_function
+
+from subprocess import check_output, call
+from optparse import OptionParser
+from datetime import datetime
+import sys
+import os
+import re
+
+
+def getUserInput(msg, default=None, validate=None):
+    while True:
+        input = raw_input(msg)
+
+        # Did we pass in a default
+        if default:
+            if input == "":
+                return default
+
+        # Did we ask to validate the input
+        if not validate:
+            return input
+        if re.search(validate, input):
+            return input
+        print("Invalid entry, didn't match regex '%s'" % validate)
+
+
+def get_branches():
+    result = {}
+    branches = check_output("git show-ref", shell=True).rstrip()
+
+    for line in branches.split('\n'):
+        sha, ref = line.split(" refs/")
+        # Matched a local branch
+        match = re.match('^heads\/(.+)$', ref)
+        if match:
+            head = result.setdefault('local', {})
+            # Record the last commit in the branch, and the ref location
+            head[match.group(1)] = {'ref': ref, 'sha': sha}
+        # Matched a remote branch
+        match = re.match('^remotes\/(.+?)\/(.+)$', ref)
+        if match:
+            remote = result.setdefault(match.group(1), {})
+            # Record the last commit in the branch, and the ref location
+            remote[match.group(2)] = {'ref': ref, 'sha': sha}
+    return result
+
+
+def get_keyrotation_branches():
+    try:
+        results = {}
+        count = 1
+        # Sort the branches so the most recent keyrotation branch is last
+        branches = (get_branches()['upstream']).keys()
+        branches.sort()
+        for branch in branches:
+            if re.search('keyrotation', branch):
+                results[count] = branch
+                count += 1
+        return results
+    except KeyError:
+        raise RuntimeError("Unable to find a remote called 'upstream'")
+
+
+def YesNo(msg, default=None):
+    while True:
+        result = getUserInput(msg, default)
+        if re.match("^(Y|y)$", result):
+            return True
+        if re.match("^(N|n)$", result):
+            return False
+
+
+def run(cmd, explain):
+    if explain:
+        return sys.stdout.write("-- %s\n" % cmd)
+    if call(cmd, shell=True):
+        print("Command '%s' returned non-zero exit status" % cmd)
+        sys.exit(1)
+
+
+def main():
+    parser = OptionParser(usage="Usage: %prog [-h]",
+                          description="Generates a new ssh key and adds it"
+                          " to the keyrotation branch")
+    parser.add_option('-e', '--explain', const=True, action='store_const',
+                      help="print commands to be executed,"
+                      " instead of executing them")
+    options, args = parser.parse_args()
+
+    # Get the root of this git repo
+    root_dir = check_output("git rev-parse --show-toplevel",
+                            shell=True).rstrip()
+    if root_dir == '':
+        print("-- Unable to find root of the git repo; not in a git repo?")
+        sys.exit(1)
+
+    # This should be the cbs-salt repo
+    if not re.search('cbs-salt', root_dir):
+        question = ("Current repo '%s' doesn't appear to be 'cbs-salt'"
+                    " repo, Continue anyway (Y/N) ? " %
+                    os.path.basename(root_dir))
+        if not YesNo(question, 'N'):
+            return 1
+
+    # Ensure we are on master first
+    run("git checkout master" % locals(), options.explain)
+
+    print("-- Looking for keyrotation branches...")
+    branches = get_keyrotation_branches()
+    for idx, branch in branches.iteritems():
+        print(" %d) %s" % (idx, branch))
+
+    # Select a key rotation branch
+    default = branches[len(branches)]
+    idx = getUserInput("-- Select a branch (%s) > " % len(branches),
+                          default=len(branches), validate='\d')
+    branch = branches[idx]
+
+    run("git checkout %(branch)s" % locals(), options.explain)
+
+    # Enter in your email
+    email = getUserInput("-- Enter your Rackspace email address > ",
+                         validate="\w?\@rackspace.com")
+
+    # Generate a new ssh key and put it in .ssh
+    timestamp = datetime.now().strftime("%Y%m%d")
+    rsa_file = '~/.ssh/id_rsa-%(email)s-%(timestamp)s' % locals()
+
+    # generate a new rsa key If doesn't already exist
+    if not os.path.exists(os.path.expanduser(rsa_file)):
+        run('ssh-keygen -trsa -b4096 -C"%(email)s-%(timestamp)s" '
+            '-f %(rsa_file)s' % locals(), options.explain)
+
+    # Enter your username for commit message
+    ssh_user = getUserInput("-- Enter ssh username > ", validate="\S*")
+    # Add the rsa to the appropriate file
+    run("cat %(rsa_file)s.pub > %(root_dir)s/files/base/common/home/%(ssh_user)s"
+        "/.ssh/authorized_keys" % locals(), options.explain)
+
+    # Add the file to the commit
+    run("git add %(root_dir)s/files/base/common/home/%(ssh_user)s"
+        "/.ssh/authorized_keys" % locals(), options.explain)
+    # Create the commit
+    run("git commit -m '%(ssh_user)s key rotation'" % locals(),
+        options.explain)
+
+    print("\n")
+    print("-- Now make a pull request from this branch and tag it with"
+          " key-rotation label")
+    print("-- ssh-add %(rsa_file)s" % locals())
+
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main())
+    except RuntimeError, e:
+        print(e)
+        sys.exit(1)
