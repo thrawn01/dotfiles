@@ -1,0 +1,11 @@
+#! /bin/bash
+
+# Add the default id_rsa
+ssh-add
+
+# Add the rackspace rotation key
+# https://github.rackspace.com/BigData/cbs-salt/wiki/CBS-SSH-Key-Rotation-Process
+ssh-add ~/.ssh/id_rsa-derrick.wippler@rackspace.com-20151208
+ssh-add ~/.ssh/id_rsa-derrick.wippler@rackspace.com-20160314
+
+
