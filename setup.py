@@ -149,8 +149,11 @@ if __name__ == "__main__":
 
     # SSH
     call('mkdir -p ~/.ssh', shell=True)
+    call('cd ssh; cp config ~/.ssh', shell=True)
+    # Don't overwrite vagrant ssh keys
+    call('cd ssh; cat authorized_keys >> ~/.ssh/authorized_keys', shell=True)
     call('chmod u+rwx,go-rwx ~/.ssh', shell=True)
-    call('cd ssh; tar -vcf - . | $( cd ~/.ssh; tar -vxf - )', shell=True)
+    call('chown %s.%s -R ~/.ssh' % (user,user), shell=True)
 
     call('git config --global color.diff auto', shell=True)
     call('git config --global color.status auto', shell=True)
