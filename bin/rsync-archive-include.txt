@@ -1,0 +1,3 @@
+/Users/thrawn/Pictures
+/Users/thrawn/Music
+/Users/thrawn/Save

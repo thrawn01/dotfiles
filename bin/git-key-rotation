@@ -29,7 +29,7 @@ def getUserInput(msg, default=None, validate=None):
 
 def get_branches():
     result = {}
-    branches = check_output("git show-ref", shell=True).rstrip()
+    branches = check_output("git show-ref", shell=True).decode('utf-8').rstrip()
 
     for line in branches.split('\n'):
         sha, ref = line.split(" refs/")
@@ -92,7 +92,7 @@ def main():
 
     # Get the root of this git repo
     root_dir = check_output("git rev-parse --show-toplevel",
-                            shell=True).rstrip()
+                            shell=True).decode('utf-8').rstrip()
     if root_dir == '':
         print("-- Unable to find root of the git repo; not in a git repo?")
         sys.exit(1)

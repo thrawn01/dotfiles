@@ -2,7 +2,7 @@
 " Maintainer:  Derrick J Wippler <thrawn01@gmail.com>
 " ======================================================
 
-set ch=1            " Make command line two lines high
+set ch=1            " Make command line 1 line high
 set mousehide       " Hide the mouse when typing text
 set dir=~/.vimswap  " Don't litter the filesystem with swapfiles
 set expandtab
@@ -35,6 +35,8 @@ if has("gui_running")
     set guifont=Menlo\ Regular:h14
   elseif has("gui_win32")
     set guifont=Consolas:h11:cANSI
+  elseif has("gui_vimr")
+    set guifont=Menlo\ Regular:h14
   endif
 endif
 
@@ -162,6 +164,7 @@ let g:go_highlight_structs = 1
 
 au FileType *.go set tabstop=4 shiftwidth=4 noexpandtab nolist
 au BufEnter *.go set ai sw=4 ts=4 noet nolist
+au BufWinEnter *.go set ai sw=4 ts=4 noet nolist
 
 au FileType *.sls set autoindent tabstop=2 shiftwidth=2 expandtab list
 au BufEnter *.sls set ai sw=2 ts=2 et list

@@ -1,0 +1,3 @@
+/Users/thrawn/Development
+/Users/thrawn/Documents
+/Users/thrawn/bin

@@ -11,7 +11,7 @@ if __name__ == '__main__':
     parser = OptionParser(usage=usage, description=description)
     options, args = parser.parse_args()
 
-    for line in check_output("git status -s", shell=True).split('\n'):
+    for line in check_output("git status -s", shell=True).decode('utf-8').split('\n'):
         try:
             status, file = line.split()
             if status.strip() != '??':

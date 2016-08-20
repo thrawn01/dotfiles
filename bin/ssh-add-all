@@ -1,0 +1,8 @@
+#! /bin/bash
+
+# Add all my keys
+for key in `ls ~/.ssh/id_rsa* | grep -v .pub`; do
+    ssh-add $key
+done
+
+

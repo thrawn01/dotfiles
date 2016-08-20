@@ -125,27 +125,25 @@ if __name__ == "__main__":
             sys.exit(-1)
         os.makedirs(bin_path)
 
-    # Get a listing of all the programs in the current directory
-    list = os.listdir(os.getcwd())
-    for file in list:
+        # Get a listing of all the programs in the bin/ directory
+        list = os.listdir(os.getcwd() + "/bin")
+        for file in list:
 
-        # Skip the setup.py program
-        if skipable(file, ['dev-utils.py', prog_name, '.swp', '^\.',
-                '\.vim', '.cnf$', 'mysql-user', 'rc$', 'README']):
-            continue
+            # Skip some files
+            if skipable(file, ['.swp', '^\.']):
+                continue
 
-        # Some file need to be linked as different names
-        newName = rename(file,  {'svn.py': 'svn'})
+            cmd = "ln -s %s/%s %s/%s" % (os.getcwd(), file, bin_path, newName)
+            print " -- ", cmd
+            call(cmd, shell=True)
 
-        cmd = "cp -f %s/%s %s/%s" % (os.getcwd(), file, bin_path, newName)
-        print " -- ", cmd
-        call(cmd, shell=True)
-
+    # Copy the dotfiles
+    cwd = os.getcwd()
     call('mkdir -p ~/.vim', shell=True)
     call('mkdir -p ~/.vimswap', shell=True)
     call('cd vim; tar -vcf - . | $( cd ~/.vim; tar -vxf - )', shell=True)
-    call('cp vimrc ~/.vimrc', shell=True)
-    call('cp gvimrc ~/.gvimrc', shell=True)
+    call('ln -s %s/.vimrc ~/.vimrc' % cwd, shell=True)
+    call('ls -s %s/.gvimrc ~/.gvimrc' % cwd, shell=True)
 
     # SSH
     call('mkdir -p ~/.ssh', shell=True)
@@ -159,31 +157,22 @@ if __name__ == "__main__":
     call('git config --global user.email thrawn01@gmail.com', shell=True)
     call('git config --global push.default current', shell=True)
 
-    bashrc = os.path.join(home_dir, ".bashrc")
+    bashrc = os.path.join(home_dir, ".bash_profile")
     # Setup .bashrc
     if path.exists("/Library"):
-        bashrc = os.path.join(home_dir, ".bash_profile")
         # OSX
-        append(bashrc, "osx/bash_profile")
         os.system('cd `git --exec-path`; sudo ln -s %s/bin/git-* ."' % home_dir)
         print "--- OSX only ---"
         print "-- brew install coreutils && brew install git && brew doctor"
         print "-- Fix the paths by modifying /etc/paths"
-
-    else:
-        # Linux
-        append(bashrc, "bashrc")
 
     print "\n\n"
     print "Choose a color for the bash prompt hostname"
     print " 1 = Red, 2 = Green, 3 = Yellow, 4 = Blue "
     print " 5 = Pink, 6 = Cyan, 7 = White, 8 = Black "
     color = getUserInput("Color (default=4) > ", '4', '^\d$')
-    edit(bashrc, "^C3=", "C3=\"\[\e[1;3%sm\]\" # <- hostname color" % color)
+    edit(bashrc, "^hostStyle=", "hostStyle=\"\e[1;36m\";" % color)
 
     print "Choose a name to report in iterm tabs"
     tab = getUserInput("Tab (default=\h) > ", '\h')
     edit(bashrc, "^TAB=", "TAB='\\033]0;%s\\007'" % tab)
-
-    print " -- Modify This line in /etc/sudoers"
-    print "%sudo	ALL=(ALL:ALL) NOPASSWD: ALL"

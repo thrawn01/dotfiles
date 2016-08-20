@@ -1,0 +1,9 @@
+cbs-salt
+lunr
+abacus
+kubernetes
+python*
+stalker
+.vagrant
+.DS_Store
+

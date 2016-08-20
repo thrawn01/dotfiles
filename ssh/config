@@ -1,4 +1,41 @@
+# RSA Logins: helpful links that match your preferred HostName below.
+# You will need to make sure you are authenticated to the endpoint 
+# in your datacenter, otherwise you won't be able to connect.
+#  https://auth.dfw1.gateway.rackspace.com/netaccess/connstatus.html
+#  https://auth.lon3.gateway.rackspace.com/netaccess/connstatus.html
+#  https://auth.ord1.gateway.rackspace.com/netaccess/connstatus.html
+#  https://auth.iad3.gateway.rackspace.com/netaccess/connstatus.html
+#  https://auth.lon5.gateway.rackspace.com/netaccess/connstatus.html
+#  https://auth.hkg1.gateway.rackspace.com/netaccess/connstatus.html
+#  https://auth.syd2.gateway.rackspace.com/netaccess/connstatus.html
+
 Host *
     ForwardX11Timeout 596h
     ForwardAgent yes
     ServerAliveInterval 30
+
+Host bastion
+    # Use any cbast server here: cbast.<datacenter>.corp.rackspace.net
+    HostName cbast.iad3.corp.rackspace.net
+    ProxyCommand none
+    User <enter-username>
+    ForwardAgent yes
+    ControlMaster auto
+
+Host *.bast
+    ProxyCommand ssh -q bastion 'nc `echo %h | sed s/\\.bast$//` %p'
+    ForwardAgent no
+    ServerAliveInterval 240
+    ControlMaster auto
+
+Host github.com
+  Hostname ssh.github.com
+  Port 443
+
+Host thrawn01.org
+   HostName thrawn01.org
+   RemoteForward 23053 127.0.0.1:23053
+
+Host thrawn01.org.bast
+   HostName thrawn01.org.bast
+   RemoteForward 23053 127.0.0.1:23053

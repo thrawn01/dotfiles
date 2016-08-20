@@ -1,6 +1,0 @@
-CREATE USER 'monty'@'localhost' IDENTIFIED BY 'some_pass';
-GRANT ALL PRIVILEGES ON *.* TO 'monty'@'localhost'
-WITH GRANT OPTION;
-
--- UPDATE mysql.user SET Password=PASSWORD('password') WHERE User='user';
--- FLUSH PRIVILEGES;
