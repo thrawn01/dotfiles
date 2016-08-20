@@ -86,7 +86,8 @@ else
 	userStyle="${blue}";
 fi;
 
-hostStyle="\e[1;36m";
+# Set by setup.py
+hostStyle="\e[1;33m";
 TAB='\033]0;\h\007'
 
 # Set the terminal title to the current working directory.

@@ -173,7 +173,7 @@ if __name__ == "__main__":
     print "Choose a color for the bash prompt hostname"
     print " 1 = Red, 2 = Green, 3 = Yellow, 4 = Blue "
     print " 5 = Pink, 6 = Cyan, 7 = White, 8 = Black "
-    color = getUserInput("Color (default=4) > ", '4', '^\d$')
+    color = getUserInput("Color (default=4) > ", '3', '^\d$')
     edit(bashrc, "^hostStyle=", "hostStyle=\"\e[1;36m\";" % color)
 
     print "Choose a name to report in iterm tabs"
