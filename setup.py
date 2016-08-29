@@ -178,4 +178,4 @@ if __name__ == "__main__":
 
     print "Choose a name to report in iterm tabs"
     tab = getUserInput("Tab (default=\h) > ", '\h')
-    edit(bashrc, "^TAB=", "TAB='\\033]0;%s\\007'" % tab)
+    edit(bashrc, "^title=", "title='\\033]0;%s\\007'" % tab)
