@@ -1,7 +1,6 @@
 #! /usr/bin/python
 
-from distutils.core import setup
-from subprocess import call
+from subprocess import call, check_output
 from os import path
 import os
 import sys
@@ -36,7 +35,7 @@ def YesNo(msg, default=None):
 
 def rename(file, rename_list):
     for old, new in rename_list.items():
-        #print ("Rename: '%s' '%s'" % (old, new))
+        # print ("Rename: '%s' '%s'" % (old, new))
         if file == old:
             return new
     return file
@@ -44,7 +43,7 @@ def rename(file, rename_list):
 
 def skipable(file, skip_regex):
     for regex in skip_regex:
-        #print ("regex: '%s' '%s'" % (regex, file))
+        # print ("regex: '%s' '%s'" % (regex, file))
         if re.search(regex, file):
             return True
     return False
@@ -71,13 +70,14 @@ def append(target, source):
             for line in src:
                 dest.write(line)
 
-def edit(file, regex, replace):
+
+def edit(file_name, regex, replace):
     output = []
     found = False
     replace = "%s\n" % replace
 
     # Open the file and search for the regex
-    with open(file, 'r') as src:
+    with open(file_name, 'r') as src:
         for line in src:
             if re.search(regex, line):
                 output.append(replace)
@@ -87,7 +87,7 @@ def edit(file, regex, replace):
 
     # If the regex was found in the file, write out the new file
     if found:
-        with open(file, 'w') as src:
+        with open(file_name, 'w') as src:
             src.truncate()
             for line in output:
                 src.write(line)
@@ -104,7 +104,6 @@ if __name__ == "__main__":
         question = "\n-- Current user '%s' != 'thrawn' Continue (Y/N) ? " % user
         if not YesNo(question, "Y"):
             sys.exit(-1)
-
 
     # Default install directory to ~/bin
     home_dir = os.environ.get('HOME', '')
@@ -125,17 +124,18 @@ if __name__ == "__main__":
             sys.exit(-1)
         os.makedirs(bin_path)
 
-        # Get a listing of all the programs in the bin/ directory
-        list = os.listdir(os.getcwd() + "/bin")
-        for file in list:
+    # Get a listing of all the programs in the bin/ directory
+    list = os.listdir(os.getcwd() + "/bin")
+    for file_name in list:
 
-            # Skip some files
-            if skipable(file, ['.swp', '^\.']):
-                continue
+        # Skip some files
+        if skipable(file_name, ['.swp', '^\.']):
+            continue
 
-            cmd = "ln -s %s/%s %s/%s" % (os.getcwd(), file, bin_path, newName)
-            print " -- ", cmd
-            call(cmd, shell=True)
+        cmd = "ln -s %s/%s %s/%s" % (os.getcwd() + "/bin",
+                                     file_name, bin_path, file_name)
+        print " -- ", cmd
+        call(cmd, shell=True)
 
     # Copy the dotfiles
     cwd = os.getcwd()
@@ -145,13 +145,19 @@ if __name__ == "__main__":
     call('ln -s %s/.vimrc ~/.vimrc' % cwd, shell=True)
     call('ls -s %s/.gvimrc ~/.gvimrc' % cwd, shell=True)
 
+
     # SSH
     call('mkdir -p ~/.ssh', shell=True)
     call('cd ssh; cp config ~/.ssh', shell=True)
-    # Don't overwrite vagrant ssh keys
-    call('cd ssh; cat authorized_keys >> ~/.ssh/authorized_keys', shell=True)
     call('chmod u+rwx,go-rwx ~/.ssh', shell=True)
-    call('chown %s.%s -R ~/.ssh' % (user,user), shell=True)
+
+    if path.exists("/Library"):
+        call('chown -R %s:staff ~/.ssh' % user, shell=True)
+    else:
+        call('chown %s.%s -R ~/.ssh' % (user, user), shell=True)
+
+    call('cp .bash_profile ~/.bash_profile', shell=True)
+    call('cp .bash_prompt ~/.bash_prompt', shell=True)
 
     call('git config --global color.diff auto', shell=True)
     call('git config --global color.status auto', shell=True)
@@ -160,11 +166,14 @@ if __name__ == "__main__":
     call('git config --global user.email thrawn01@gmail.com', shell=True)
     call('git config --global push.default current', shell=True)
 
+    bashprompt = os.path.join(home_dir, ".bash_prompt")
     bashrc = os.path.join(home_dir, ".bash_profile")
     # Setup .bashrc
     if path.exists("/Library"):
         # OSX
-        os.system('cd `git --exec-path`; sudo ln -s %s/bin/git-* ."' % home_dir)
+        os.chdir(check_output(["git", "--exec-path"]).rstrip('\n'))
+        os.system('sudo ln -s %s/bin/git-* .' % home_dir)
+        os.chdir(cwd)
         print "--- OSX only ---"
         print "-- brew install coreutils && brew install git && brew doctor"
         print "-- Fix the paths by modifying /etc/paths"
@@ -174,7 +183,7 @@ if __name__ == "__main__":
     print " 1 = Red, 2 = Green, 3 = Yellow, 4 = Blue "
     print " 5 = Pink, 6 = Cyan, 7 = White, 8 = Black "
     color = getUserInput("Color (default=4) > ", '3', '^\d$')
-    edit(bashrc, "^hostStyle=", "hostStyle=\"\e[1;36m\";" % color)
+    edit(bashprompt, "^hostStyle=", "hostStyle=\"\e[1;3%sm\";" % color)
 
     print "Choose a name to report in iterm tabs"
     tab = getUserInput("Tab (default=\h) > ", '\h')
