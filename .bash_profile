@@ -33,7 +33,7 @@ export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
 export PATH=/Applications/Firefox.app/Contents/MacOS:$PATH
 
 # Lunchy a better launchctl
-LUNCHY_DIR=$(dirname `gem which lunchy`)/../extras
+LUNCHY_DIR=$(dirname `gem which lunchy 2> /dev/null` 2> /dev/null)/../extras
 if [ -f $LUNCHY_DIR/lunchy-completion.bash ]; then
  . $LUNCHY_DIR/lunchy-completion.bash
 fi

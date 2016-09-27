@@ -143,7 +143,7 @@ if __name__ == "__main__":
     call('mkdir -p ~/.vimswap', shell=True)
     call('cd vim; tar -vcf - . | $( cd ~/.vim; tar -vxf - )', shell=True)
     call('ln -s %s/.vimrc ~/.vimrc' % cwd, shell=True)
-    call('ls -s %s/.gvimrc ~/.gvimrc' % cwd, shell=True)
+    call('ln -s %s/.gvimrc ~/.gvimrc' % cwd, shell=True)
 
 
     # SSH
