@@ -10,12 +10,6 @@ source ~/.bash_prompt
 # Standard PATH things
 export PATH=/usr/local/bin:/usr/local/sbin:$PATH
 
-# Silent virtualenv
-if [ -e ~/.virtualenv ]; then
-    export VIRTUAL_ENV_DISABLE_PROMPT=1
-    source ~/.virtualenv/bin/activate 2> /dev/null
-fi
-
 # NVM Stuff
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
@@ -48,8 +42,15 @@ alias vpn-up='sudo openconnect vpn.dfw1.rackspace.com -b'
 ulimit -n 8096
 
 # For PyEnv
+export VIRTUAL_ENV_DISABLE_PROMPT=1
 export PYENV_ROOT=/usr/local/var/pyenv
-if which pyenv > /dev/null; then eval "$(pyenv init -)"; fi
+if which pyenv > /dev/null; then
+    eval "$(pyenv init -)"
+
+    # virtualenvwrapper init
+    export WORKON_HOME=/Users/thrawn/.virtualenvs
+    source `pyenv which virtualenvwrapper.sh`
+fi
 
 # Case-insensitive globbing (used in pathname expansion)
 shopt -s nocaseglob
