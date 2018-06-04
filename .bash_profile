@@ -1,5 +1,4 @@
-
-alias ssh='ssh -X'
+alias sh='rewrite-args ssh -X'
 eval `gdircolors`
 alias ls='gls --color=auto'
 alias gvim='~/bin/gvim-tabs.py'

@@ -118,7 +118,7 @@ call vundle#rc()
 Bundle 'gmarik/Vundle.vim'
 
 " Completion with CTRL-J
-Bundle 'Valloric/YouCompleteMe'
+"Bundle 'Valloric/YouCompleteMe'
 " GIT plugin :Gdiff
 Bundle 'tpope/vim-fugitive'
 " Start TagBar with F8
@@ -135,8 +135,9 @@ Bundle 'scrooloose/nerdtree'
 Plugin 'bling/vim-airline'
 " Go Language Plugins
 Plugin 'fatih/vim-go'
-" GeekNote Plugin
-Bundle 'https://github.com/neilagabriel/vim-geeknote'
+" React stuff
+Bundle 'pangloss/vim-javascript'
+Bundle 'mxw/vim-jsx'
 
 " GeekNote Plugin Settings
 noremap <F9> :Geeknote<CR>
@@ -168,3 +169,7 @@ au BufWinEnter *.go set ai sw=4 ts=4 noet nolist
 
 au FileType *.sls set autoindent tabstop=2 shiftwidth=2 expandtab list
 au BufEnter *.sls set ai sw=2 ts=2 et list
+
+" Yaml files
+au FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
+au BufEnter yaml setlocal  ts=2 sts=2 sw=2 expandtab
