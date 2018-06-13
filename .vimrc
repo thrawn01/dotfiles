@@ -114,30 +114,31 @@ let g:pymode_indent = 0
 set rtp+=~/.vim/bundle/Vundle.vim/
 call vundle#rc()
 
-" Vundle Managed Vim Plugins ( :PluginInstall to install the Managed Bundles )
-Bundle 'gmarik/Vundle.vim'
+" Vundle Managed Vim Plugins ( :PluginInstall to install the Managed Plugins )
+Plugin 'VundleVim/Vundle.vim'
 
 " Completion with CTRL-J
-"Bundle 'Valloric/YouCompleteMe'
+"Plugin 'Valloric/YouCompleteMe'
 " GIT plugin :Gdiff
-Bundle 'tpope/vim-fugitive'
+"Plugin 'tpope/vim-fugitive'
 " Start TagBar with F8
-Bundle 'majutsushi/tagbar'
+"Plugin 'majutsushi/tagbar'
 " Pep8 Check with F7
-Bundle 'nvie/vim-flake8'
+"Plugin 'nvie/vim-flake8'
+
 " Search for files with CTRL-P
-Bundle 'kien/ctrlp.vim'
+Plugin 'kien/ctrlp.vim'
 " Fixes indent to be pep8 compatable
-Bundle 'hynek/vim-python-pep8-indent'
+Plugin 'hynek/vim-python-pep8-indent'
 " Opens when VIM gets a directory to open
-Bundle 'scrooloose/nerdtree'
+Plugin 'scrooloose/nerdtree'
 " Fancy Status Line
 Plugin 'bling/vim-airline'
 " Go Language Plugins
 Plugin 'fatih/vim-go'
 " React stuff
-Bundle 'pangloss/vim-javascript'
-Bundle 'mxw/vim-jsx'
+Plugin 'pangloss/vim-javascript'
+Plugin 'mxw/vim-jsx'
 
 " GeekNote Plugin Settings
 noremap <F9> :Geeknote<CR>
