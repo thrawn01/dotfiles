@@ -1,0 +1,47 @@
+alias ssh='rewrite-args ssh -X'
+alias ls='ls --color=always'
+
+# Leet Prompt
+source ~/.bash_prompt
+
+# Standard PATH things
+export PATH=/usr/local/bin:/usr/local/sbin:$PATH
+
+# GoLang Stuff
+export GOPATH=$HOME/Development/go
+export GOROOT=/opt/golang/current
+export PATH=$HOME/bin:$GOROOT/bin:$GOPATH/bin:$PATH
+export GO15VENDOREXPERIMENT=1
+
+# For PyEnv
+export VIRTUAL_ENV_DISABLE_PROMPT=1
+export PYENV_ROOT=/usr/local/var/pyenv
+if which pyenv > /dev/null; then
+    eval "$(pyenv init -)"
+
+    # virtualenvwrapper init
+    export WORKON_HOME=/Users/thrawn/.virtualenvs
+    source `pyenv which virtualenvwrapper.sh`
+fi
+
+# Case-insensitive globbing (used in pathname expansion)
+shopt -s nocaseglob
+
+# Append to the Bash history file, rather than overwriting it
+shopt -s histappend
+
+# Autocorrect typos in path names when using `cd`
+shopt -s cdspell
+
+# Enable some Bash 4 features when possible:
+# * `autocd`, e.g. `**/qux` will enter `./foo/bar/baz/qux`
+# * Recursive globbing, e.g. `echo **/*.txt`
+for option in autocd globstar; do
+    shopt -s "$option" 2> /dev/null
+done
+
+# X Server
+export DISPLAY=:0
+
+# fix file creation
+umask 022

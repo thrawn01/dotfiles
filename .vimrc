@@ -55,18 +55,18 @@ nmap <C-S-N> :tabnew<cr>
 imap <C-t> <ESC>:tabnew<cr>
 
 " Support virtualenv if it exists
-if has('python')
-py << EOF
-import os.path
-import sys
-import vim
-if 'VIRTUAL_ENV' in os.environ:
-    project_base_dir = os.environ['VIRTUAL_ENV']
-    sys.path.insert(0, project_base_dir)
-    activate_this = os.path.join(project_base_dir, 'bin/activate_this.py')
-    execfile(activate_this, dict(__file__=activate_this))
-EOF
-endif
+"if has('python')
+"py << EOF
+"import os.path
+"import sys
+"import vim
+"if 'VIRTUAL_ENV' in os.environ:
+    "project_base_dir = os.environ['VIRTUAL_ENV']
+    "sys.path.insert(0, project_base_dir)
+    "activate_this = os.path.join(project_base_dir, 'bin/activate_this.py')
+    "execfile(activate_this, dict(__file__=activate_this))
+"EOF
+"endif
 
 " Put the basename on the GUI Tabs instead of the full path
 function GuiTabLabel()
@@ -111,33 +111,8 @@ set wildignore+=*.pyc,*.so,*.swp,
 let g:pymode_indent = 0 
 
 " Vundle
-set rtp+=~/.vim/bundle/Vundle.vim/
-call vundle#rc()
-
-" Vundle Managed Vim Plugins ( :PluginInstall to install the Managed Bundles )
-Bundle 'gmarik/Vundle.vim'
-
-" Completion with CTRL-J
-"Bundle 'Valloric/YouCompleteMe'
-" GIT plugin :Gdiff
-Bundle 'tpope/vim-fugitive'
-" Start TagBar with F8
-Bundle 'majutsushi/tagbar'
-" Pep8 Check with F7
-Bundle 'nvie/vim-flake8'
-" Search for files with CTRL-P
-Bundle 'kien/ctrlp.vim'
-" Fixes indent to be pep8 compatable
-Bundle 'hynek/vim-python-pep8-indent'
-" Opens when VIM gets a directory to open
-Bundle 'scrooloose/nerdtree'
-" Fancy Status Line
-Plugin 'bling/vim-airline'
-" Go Language Plugins
-Plugin 'fatih/vim-go'
-" React stuff
-Bundle 'pangloss/vim-javascript'
-Bundle 'mxw/vim-jsx'
+"set rtp+=~/.vim/bundle/Vundle.vim/
+"call vundle#rc()
 
 " GeekNote Plugin Settings
 noremap <F9> :Geeknote<CR>
