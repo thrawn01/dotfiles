@@ -165,6 +165,8 @@ if __name__ == "__main__":
     call('git config --global user.name "Derrick J. Wippler"', shell=True)
     call('git config --global user.email thrawn01@gmail.com', shell=True)
     call('git config --global push.default current', shell=True)
+    # Add this so go mod will pull without `unknown revision` errors
+    call('git config --global url."git@github.com:".insteadOf https://github.com/', shell=True)
 
     bashprompt = os.path.join(home_dir, ".bash_prompt")
     bashrc = os.path.join(home_dir, ".bash_profile")
