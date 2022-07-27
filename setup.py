@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#! env python
 
 from subprocess import call, check_output
 from os import path
@@ -7,26 +7,26 @@ import sys
 import re
 
 
-def getUserInput(msg, default=None, validate=None):
+def get_user_input(msg, default=None, validate=None):
     while True:
-        input = raw_input(msg)
+        choice = input(msg)
 
         # Did we pass in a default
         if default:
-            if input == "":
+            if choice == "":
                 return default
 
         # Did we ask to validate the input
         if not validate:
-            return input
-        if re.search(validate, input):
-            return input
-        print "Invalid entry, Try again"
+            return choice
+        if re.search(validate, choice):
+            return choice
+        print("Invalid entry, Try again")
 
 
-def YesNo(msg, default=None):
+def yes_no(msg, default=None):
     while True:
-        result = getUserInput(msg, default)
+        result = get_user_input(msg, default)
         if re.match("^(Y|y)$", result):
             return True
         if re.match("^(N|n)$", result):
@@ -56,7 +56,7 @@ def search(file, needle):
                 if re.search(needle, line):
                     return True
         return False
-    except IOError, e:
+    except IOError as e:
         return False
 
 
@@ -71,13 +71,13 @@ def append(target, source):
                 dest.write(line)
 
 
-def edit(file_name, regex, replace):
+def edit(file, regex, replace):
     output = []
     found = False
     replace = "%s\n" % replace
 
     # Open the file and search for the regex
-    with open(file_name, 'r') as src:
+    with open(file, 'r') as src:
         for line in src:
             if re.search(regex, line):
                 output.append(replace)
@@ -87,7 +87,7 @@ def edit(file_name, regex, replace):
 
     # If the regex was found in the file, write out the new file
     if found:
-        with open(file_name, 'w') as src:
+        with open(file, 'w') as src:
             src.truncate()
             for line in output:
                 src.write(line)
@@ -102,25 +102,25 @@ if __name__ == "__main__":
     user = os.environ.get('USER', '')
     if user != 'thrawn':
         question = "\n-- Current user '%s' != 'thrawn' Continue (Y/N) ? " % user
-        if not YesNo(question, "Y"):
+        if not yes_no(question, "Y"):
             sys.exit(-1)
 
     # Default install directory to ~/bin
     home_dir = os.environ.get('HOME', '')
     if home_dir == '':
-        print "-- Could not determine your home directory"
+        print("-- Could not determine your home directory")
         sys.exit(-1)
 
     bin_path = os.path.join(home_dir, "bin")
 
     # If the user supplied a dest directory, use that instead
     if len(sys.argv) > 1:
-        print "-- Installing into %s" % sys.argv[1]
+        print("-- Installing into %s" % sys.argv[1])
         bin_path = sys.argv[1]
 
     if not path.exists(bin_path):
         question = "\n-- '%s' doesn't exist, create it (Y/N) ? " % bin_path
-        if not YesNo(question, "Y"):
+        if not yes_no(question, "Y"):
             sys.exit(-1)
         os.makedirs(bin_path)
 
@@ -134,7 +134,7 @@ if __name__ == "__main__":
 
         cmd = "ln -s %s/%s %s/%s" % (os.getcwd() + "/bin",
                                      file_name, bin_path, file_name)
-        print " -- ", cmd
+        print(" -- ", cmd)
         call(cmd, shell=True)
 
     # Copy the dotfiles
@@ -144,7 +144,6 @@ if __name__ == "__main__":
     call('cd vim; tar -vcf - . | $( cd ~/.vim; tar -vxf - )', shell=True)
     call('ln -s %s/.vimrc ~/.vimrc' % cwd, shell=True)
     call('ln -s %s/.gvimrc ~/.gvimrc' % cwd, shell=True)
-
 
     # SSH
     call('mkdir -p ~/.ssh', shell=True)
@@ -173,20 +172,20 @@ if __name__ == "__main__":
     # Setup .bashrc
     if path.exists("/Library"):
         # OSX
-        os.chdir(check_output(["git", "--exec-path"]).rstrip('\n'))
+        os.chdir(check_output(["git", "--exec-path"]).rstrip(b'\n'))
         os.system('sudo ln -s %s/bin/git-* .' % home_dir)
         os.chdir(cwd)
-        print "--- OSX only ---"
-        print "-- brew install coreutils && brew install git && brew doctor"
-        print "-- Fix the paths by modifying /etc/paths"
+        print("--- OSX only ---")
+        print("-- brew install coreutils && brew install git && brew doctor")
+        print("-- Fix the paths by modifying /etc/paths")
 
-    print "\n\n"
-    print "Choose a color for the bash prompt hostname"
-    print " 1 = Red, 2 = Green, 3 = Yellow, 4 = Blue "
-    print " 5 = Pink, 6 = Cyan, 7 = White, 8 = Black "
-    color = getUserInput("Color (default=4) > ", '3', '^\d$')
-    edit(bashprompt, "^hostStyle=", "hostStyle=\"\e[1;3%sm\";" % color)
+    # print("\n\n")
+    # print("Choose a color for the bash prompt hostname")
+    # print(" 1 = Red, 2 = Green, 3 = Yellow, 4 = Blue ")
+    # print(" 5 = Pink, 6 = Cyan, 7 = White, 8 = Black ")
+    # color = get_user_input("Color (default=4) > ", '3', '^\d$')
+    # edit(bashprompt, "^hostStyle=", "hostStyle=\"\e[1;3%sm\";" % color)
 
-    print "Choose a name to report in iterm tabs"
-    tab = getUserInput("Tab (default=\h) > ", '\h')
-    edit(bashrc, "^title=", "title='\\033]0;%s\\007'" % tab)
+    # print("Choose a name to report in iterm tabs")
+    # tab = get_user_input("Tab (default=\h) > ", '\h')
+    # edit(bashrc, "^title=", "title='\\033]0;%s\\007'" % tab)
