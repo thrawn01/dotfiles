@@ -1,5 +1,4 @@
 # Install from https://github.com/romkatv/powerlevel10k
-#source /usr/local/opt/powerlevel10k/powerlevel10k.zsh-theme
 source /opt/homebrew/opt/powerlevel10k/powerlevel10k.zsh-theme
 
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
@@ -43,7 +42,6 @@ export CLICOLOR=1
 export LSCOLORS="exfxfxdxcxegedabagacad"
 alias ls='ls -G'
 
-
 export HOMEBREW_PREFIX="/opt/homebrew";
 export HOMEBREW_CELLAR="/opt/homebrew/Cellar";
 export HOMEBREW_REPOSITORY="/opt/homebrew";
@@ -58,3 +56,16 @@ export PATH="/opt/homebrew/bin:/opt/homebrew/sbin${PATH+:$PATH}";
 
 # Python
 export PATH="/opt/homebrew/opt/python@3.9/libexec/bin${PATH+:$PATH}";
+
+# Golang
+export GOPRIVATE=github.com/mailgun
+export GOPATH=/Users/thrawn/Development/go
+export GOROOT=/usr/local/go
+export GOBIN=$GOPATH/bin
+export PATH=$GOBIN:$PATH
+
+# # Mailgun Stuff
+alias ssh='rewrite-args ssh -X'
+
+# Home bin
+export PATH=/Users/thrawn/bin:$PATH
