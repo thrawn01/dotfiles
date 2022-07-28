@@ -59,13 +59,13 @@ export PATH="/opt/homebrew/opt/python@3.9/libexec/bin${PATH+:$PATH}";
 
 # Golang
 export GOPRIVATE=github.com/mailgun
-export GOPATH=/Users/thrawn/Development/go
+export GOPATH=/Users/thrawn/go
 export GOROOT=/usr/local/go
 export GOBIN=$GOPATH/bin
 export PATH=$GOBIN:$PATH
 
-# # Mailgun Stuff
+# Rewrite
 alias ssh='rewrite-args ssh -X'
 
 # Home bin
-export PATH=/Users/thrawn/bin:$PATH
+export PATH="/Users/thrawn/bin${PATH+:$PATH}";
