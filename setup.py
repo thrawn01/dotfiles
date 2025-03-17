@@ -1,4 +1,4 @@
-#! env python
+#! env python3
 
 from subprocess import call, check_output
 from os import path

@@ -18,25 +18,6 @@ export PATH=/usr/local/bin:/usr/local/sbin:$PATH
 export ETCDCTL_API=3
 export ETCDCTL_ENDPOINTS=localhost:2379
 
-# Eventbus stuff
-export ETCD_ENDPOINT=http://localhost:2379
-export EVENTBUS_ENDPOINT=localhost:19091
-export KAFKA_PIXY_ENDPOINT=localhost:19091
-
-# === SEE 1Password for API KEYS ===
-
-# mailgun-go stuff for runscope and travis ci testing
-export MG_API_KEY=
-export MG_DOMAIN=
-export MG_URL=https://api.mailgun.net/v3
-
-# mailgun-go stuff for mg.thrawn01.org
-export MG_API_KEY=
-export MG_DOMAIN=
-export MG_URL=https://api.mailgun.net/v3
-
-export SLACK_TOKEN=
-
 # Colorize ls files (Goto https://geoff.greer.fm/lscolors/ to change colors)
 export CLICOLOR=1
 export LSCOLORS="exfxfxdxcxegedabagacad"
@@ -59,10 +40,24 @@ export PATH="/opt/homebrew/opt/python@3.9/libexec/bin${PATH+:$PATH}";
 
 # Golang
 export GOPRIVATE=github.com/mailgun
+
+# The GOROOT directory for the 'go' installation which contains the Go toolchain
+# and standard library.
+export GOROOT=/Users/thrawn/go/go1.24.1
+
+# The GOPATH variable is used for the following purposes
+# - The 'go install' command installs binaries to $GOBIN, which defaults to $GOPATH/bin.
+# - The 'go get' command caches downloaded modules in $GOMODCACHE, which defaults to $GOPATH/pkg/mod.
+# - The 'go get' command caches downloaded checksum database state in $GOPATH/pkg/sumdb.
 export GOPATH=/Users/thrawn/go
-export GOROOT=/usr/local/go
-export GOBIN=$GOPATH/bin
-export PATH=$GOBIN:$PATH
+
+# Place both GOROOT and GOPATH in the PATH
+export PATH=$GOROOT/bin:$PATH
+export PATH=$GOPATH/bin:$PATH
+
+# Zig
+export ZIGPATH=/Users/thrawn/zig
+export PATH=$ZIGPATH:$PATH
 
 # Rewrite
 alias ssh='rewrite-args ssh -X'
