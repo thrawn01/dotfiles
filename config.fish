@@ -13,7 +13,7 @@ fish_add_path /opt/homebrew/opt/python@3/libexec/bin
 
 # The GOROOT directory for the 'go' installation which contains the Go toolchain
 # and standard library.
-set -gx GOROOT /Users/thrawn/go/go1.24.1
+set -gx GOROOT /Users/thrawn/go/go1.24.4
 
 # The GOPATH variable is used for the following purposes
 # - The 'go install' command installs binaries to $GOBIN, which defaults to $GOPATH/bin.
